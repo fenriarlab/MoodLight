@@ -1,0 +1,15 @@
+{
+  "@@locale": "zh",
+  "appTitle": "MoodLight 心情日记",
+  "offlineBadge": "100% 本地隐私留存",
+  "tabDiaries": "日记",
+  "tabStats": "趋势分析",
+  "tabSettings": "设置",
+  "recordMood": "记心情",
+  "averageMood": "近期平均心情",
+  "totalRecords": "已记录日记",
+  "moodSliderTitle": "选择今日的心情表达 (-5 至 +5)",
+  "contentPlaceholder": "写下此刻的心情与故事...",
+  "saveDiary": "保存心情日记",
+  "noDiariesYet": "还没有记录心情，点击下方按钮写第一篇吧！"
+}

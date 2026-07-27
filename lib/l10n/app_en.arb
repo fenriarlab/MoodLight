@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "appTitle": "MoodLight",
+  "offlineBadge": "100% Offline & Private",
+  "tabDiaries": "Diaries",
+  "tabStats": "Stats",
+  "tabSettings": "Settings",
+  "recordMood": "Log Mood",
+  "averageMood": "Average Mood",
+  "totalRecords": "Total Entries",
+  "moodSliderTitle": "Select your mood score (-5 to +5)",
+  "contentPlaceholder": "Write down your thoughts and feelings...",
+  "saveDiary": "Save Diary",
+  "noDiariesYet": "No mood entries yet. Tap below to write your first entry!"
+}
