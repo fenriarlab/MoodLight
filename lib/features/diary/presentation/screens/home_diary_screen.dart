@@ -377,7 +377,9 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
               Color bgColor = AppColors.darkElevated.withOpacity(0.3);
 
               if (dayDiaries.isNotEmpty) {
-                final colors = dayDiaries.map((d) => AppColors.getMoodColor(d.score)).toList();
+                // 按时间正序排列（早晨在上/左，晚间在下/右），使渐变方向从左上（时间靠前）平滑过渡至右下（时间靠后）
+                final chronological = dayDiaries.toList()..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+                final colors = chronological.map((d) => AppColors.getMoodColor(d.score)).toList();
                 if (colors.length == 1) {
                   bgGradient = LinearGradient(
                     begin: Alignment.topLeft,
