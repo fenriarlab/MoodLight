@@ -71,69 +71,60 @@ class DiaryCard extends StatelessWidget {
 
     return InkWell(
       onLongPress: () => _showOptionsSheet(context),
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: tc.isDark ? const Color(0xFF262A33) : const Color(0xFFFAF7FF),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Soft Circle Emoji Badge
+            // Soft Vibrant Circle Emoji Badge (50x50)
             Container(
-              width: 44,
-              height: 44,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: moodColor.withOpacity(0.18),
+                color: moodColor.withOpacity(0.24),
               ),
               child: Center(
                 child: Text(
                   item.moodEmoji,
-                  style: const TextStyle(fontSize: 22),
+                  style: const TextStyle(fontSize: 24),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
 
-            // Content & Time Layout
+            // Content & Time Layout (Matching Right Mockup 1:1)
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _formatHumanizedTime(item.createdAt),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: tc.textSecondary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        AppColors.getMoodText(item.score),
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: moodColor,
-                        ),
-                      ),
-                    ],
+                  // Humanized Timestamp
+                  Text(
+                    _formatHumanizedTime(item.createdAt),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: tc.isDark ? const Color(0xFFA595C4) : const Color(0xFF8B7AA8),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
+                  // Content Text Spanning Full Width Smoothly
                   Text(
                     item.content.isEmpty ? '（未填写心情感悟）' : item.content,
                     style: TextStyle(
                       fontSize: 14,
                       color: tc.textPrimary,
                       height: 1.35,
+                      fontWeight: FontWeight.w400,
                     ),
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (item.tags.isNotEmpty) ...[

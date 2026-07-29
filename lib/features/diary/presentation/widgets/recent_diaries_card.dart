@@ -37,7 +37,7 @@ class RecentDiariesCard extends StatelessWidget {
 
       if (selectedDateDiaries.isNotEmpty) {
         displayList = selectedDateDiaries;
-        cardTitle = '${selectedDate!.month}月${selectedDate!.day}日的心情 (${selectedDateDiaries.length}篇)';
+        cardTitle = '${selectedDate!.month}月${selectedDate!.day}日的心情';
       }
     }
 
