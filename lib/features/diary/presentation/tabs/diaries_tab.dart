@@ -95,6 +95,7 @@ class DiariesTab extends StatelessWidget {
           if (isCalendarView)
             RecentDiariesCard(
               diaries: filteredDiaries,
+              selectedDate: calendarSelectedDate,
               onDeleteDiary: onDeleteDiary,
               onEditDiary: onEditDiary,
               onReload: onReload,

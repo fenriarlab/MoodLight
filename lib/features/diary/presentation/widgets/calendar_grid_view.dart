@@ -317,22 +317,6 @@ class CalendarGridView extends StatelessWidget {
             ),
           ),
 
-          // 4. Selected Date Entries Detail List (Only rendered if entries exist)
-          if (selectedDayDiaries.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: tc.divider)),
-              ),
-              child: Column(
-                children: selectedDayDiaries
-                    .map((diary) => DiaryCard(
-                          item: diary,
-                          onDelete: () => onDeleteDiary(diary),
-                        ))
-                    .toList(),
-              ),
-            ),
         ],
       ),
     );
