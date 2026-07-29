@@ -317,56 +317,22 @@ class CalendarGridView extends StatelessWidget {
             ),
           ),
 
-          // 4. Selected Date Entries Detail List
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: tc.divider)),
+          // 4. Selected Date Entries Detail List (Only rendered if entries exist)
+          if (selectedDayDiaries.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: tc.divider)),
+              ),
+              child: Column(
+                children: selectedDayDiaries
+                    .map((diary) => DiaryCard(
+                          item: diary,
+                          onDelete: () => onDeleteDiary(diary),
+                        ))
+                    .toList(),
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l10n?.dateDetailsHeader(DateFormat(dayDateFormat).format(selectedDate), selectedDayDiaries.length) ??
-                          "📅 ${DateFormat(dayDateFormat).format(selectedDate)} • 共 ${selectedDayDiaries.length} 篇心情",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: tc.textPrimary),
-                    ),
-                    TextButton.icon(
-                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                      onPressed: () => onRetroactiveRecord(selectedDate),
-                      icon: const Icon(Icons.add_circle_outline, size: 14, color: Color(0xFF8C52EE)),
-                      label: Text(
-                        l10n?.retroactiveButton("${selectedDate.month}/${selectedDate.day}") ?? "补记 ${selectedDate.month}/${selectedDate.day}",
-                        style: const TextStyle(color: Color(0xFF8C52EE), fontSize: 11, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-                if (selectedDayDiaries.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Center(
-                      child: Text(
-                        l10n?.noEntriesForDate ?? '🌱 该天尚无心情记录',
-                        style: TextStyle(color: tc.textSecondary, fontSize: 12),
-                      ),
-                    ),
-                  )
-                else
-                  Column(
-                    children: selectedDayDiaries
-                        .map((diary) => DiaryCard(
-                              item: diary,
-                              onDelete: () => onDeleteDiary(diary),
-                            ))
-                        .toList(),
-                  ),
-              ],
-            ),
-          ),
         ],
       ),
     );
