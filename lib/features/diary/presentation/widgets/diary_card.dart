@@ -6,86 +6,163 @@ import '../../data/models/mood_diary_model.dart';
 class DiaryCard extends StatelessWidget {
   final MoodDiaryModel item;
   final VoidCallback onDelete;
+  final VoidCallback? onEdit;
 
   const DiaryCard({
     super.key,
     required this.item,
     required this.onDelete,
+    this.onEdit,
   });
+
+  String _formatHumanizedTime(DateTime dt) {
+    final now = DateTime.now();
+    final timeStr = "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
+    if (dt.year == now.year && dt.month == now.month && dt.day == now.day) {
+      return "今天 $timeStr";
+    }
+    final yesterday = now.subtract(const Duration(days: 1));
+    if (dt.year == yesterday.year && dt.month == yesterday.month && dt.day == yesterday.day) {
+      return "昨天 $timeStr";
+    }
+    return "${dt.month}月${dt.day}日 $timeStr";
+  }
+
+  void _showOptionsSheet(BuildContext context) {
+    final tc = ThemeColors.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: tc.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              if (onEdit != null)
+                ListTile(
+                  leading: const Icon(Icons.edit_outlined, color: Color(0xFF8C52EE)),
+                  title: Text('编辑日记', style: TextStyle(color: tc.textPrimary)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onEdit!();
+                  },
+                ),
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Color(0xFFFF6B6B)),
+                title: const Text('删除日记', style: TextStyle(color: Color(0xFFFF6B6B))),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onDelete();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
     final moodColor = AppColors.getMoodColor(item.score);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: tc.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: tc.isDark ? const Color(0xFF39334D) : const Color(0xFFEFE8FB),
+    return InkWell(
+      onLongPress: () => _showOptionsSheet(context),
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: tc.isDark ? const Color(0xFF262A33) : const Color(0xFFFAF7FF),
+          borderRadius: BorderRadius.circular(18),
         ),
-        boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Text(item.moodEmoji, style: const TextStyle(fontSize: 28)),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppColors.getMoodText(item.score),
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: moodColor),
+            // Soft Circle Emoji Badge
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: moodColor.withOpacity(0.18),
+              ),
+              child: Center(
+                child: Text(
+                  item.moodEmoji,
+                  style: const TextStyle(fontSize: 22),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Content & Time Layout
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _formatHumanizedTime(item.createdAt),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: tc.textSecondary,
+                          fontWeight: FontWeight.w500,
                         ),
-                        Text(
-                          "${item.createdAt.year}-${item.createdAt.month.toString().padLeft(2, '0')}-${item.createdAt.day.toString().padLeft(2, '0')} ${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}",
-                          style: TextStyle(fontSize: 12, color: tc.textSecondary),
+                      ),
+                      Text(
+                        AppColors.getMoodText(item.score),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: moodColor,
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.content.isEmpty ? '（未填写心情感悟）' : item.content,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: tc.textPrimary,
+                      height: 1.35,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (item.tags.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: item.tags.map((tag) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF8C52EE).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            tag,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Color(0xFF8C52EE),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ],
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: tc.textSecondary.withOpacity(0.6), size: 20),
-                  onPressed: onDelete,
-                ),
-              ],
-            ),
-            if (item.content.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(item.content, style: TextStyle(fontSize: 15, color: tc.textPrimary, height: 1.4)),
-            ],
-            if (item.tags.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 6,
-                runSpacing: 4,
-                children: item.tags.map((tag) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8C52EE).withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF8C52EE).withOpacity(0.3), width: 0.5),
-                    ),
-                    child: Text(
-                      tag,
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF8C52EE), fontWeight: FontWeight.w500),
-                    ),
-                  );
-                }).toList(),
+                ],
               ),
-            ],
+            ),
           ],
         ),
       ),

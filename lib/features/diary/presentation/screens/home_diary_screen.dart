@@ -210,6 +210,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                 await _repository.deleteDiary(diary.id);
                 _loadDiaries();
               },
+              onReload: _loadDiaries,
               onTrendTap: () => setState(() => _currentIndex = 1),
             ),
             StatsTab(diaries: _diaries),

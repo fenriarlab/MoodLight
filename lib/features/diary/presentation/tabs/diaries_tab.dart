@@ -5,6 +5,7 @@ import '../../data/models/mood_diary_model.dart';
 import '../widgets/emotion_weather_card.dart';
 import '../widgets/tag_filter_bar.dart';
 import '../widgets/calendar_grid_view.dart';
+import '../widgets/recent_diaries_card.dart';
 import '../widgets/diary_card.dart';
 
 class DiariesTab extends StatelessWidget {
@@ -21,6 +22,8 @@ class DiariesTab extends StatelessWidget {
   final Function(DateTime) onDateSelected;
   final Function(DateTime) onRetroactiveRecord;
   final Function(MoodDiaryModel) onDeleteDiary;
+  final Function(MoodDiaryModel)? onEditDiary;
+  final VoidCallback onReload;
   final VoidCallback? onTrendTap;
 
   const DiariesTab({
@@ -38,6 +41,8 @@ class DiariesTab extends StatelessWidget {
     required this.onDateSelected,
     required this.onRetroactiveRecord,
     required this.onDeleteDiary,
+    this.onEditDiary,
+    required this.onReload,
     this.onTrendTap,
   });
 
@@ -86,6 +91,15 @@ class DiariesTab extends StatelessWidget {
                 )
               : _buildTimelineListView(context, filteredDiaries, tc, l10n),
 
+          // 4. "最近心情记录" + "全部记录 >" Container Card
+          if (isCalendarView)
+            RecentDiariesCard(
+              diaries: filteredDiaries,
+              onDeleteDiary: onDeleteDiary,
+              onEditDiary: onEditDiary,
+              onReload: onReload,
+            ),
+
           const SizedBox(height: 16),
         ],
       ),
@@ -118,6 +132,7 @@ class DiariesTab extends StatelessWidget {
         return DiaryCard(
           item: item,
           onDelete: () => onDeleteDiary(item),
+          onEdit: onEditDiary != null ? () => onEditDiary!(item) : null,
         );
       },
     );
