@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../data/models/mood_diary_model.dart';
+import '../widgets/emotion_weather_card.dart';
 import '../widgets/tag_filter_bar.dart';
 import '../widgets/calendar_grid_view.dart';
+import '../widgets/bottom_quote_banner.dart';
 import '../widgets/diary_card.dart';
 
 class DiariesTab extends StatelessWidget {
@@ -20,6 +22,8 @@ class DiariesTab extends StatelessWidget {
   final Function(DateTime) onDateSelected;
   final Function(DateTime) onRetroactiveRecord;
   final Function(MoodDiaryModel) onDeleteDiary;
+  final VoidCallback onRecordTap;
+  final VoidCallback? onTrendTap;
 
   const DiariesTab({
     super.key,
@@ -36,6 +40,8 @@ class DiariesTab extends StatelessWidget {
     required this.onDateSelected,
     required this.onRetroactiveRecord,
     required this.onDeleteDiary,
+    required this.onRecordTap,
+    this.onTrendTap,
   });
 
   @override
@@ -51,16 +57,26 @@ class DiariesTab extends StatelessWidget {
         ? diaries
         : diaries.where((d) => d.tags.contains(selectedFilterTag)).toList();
 
-    return Column(
-      children: [
-        TagFilterBar(
-          defaultPresetTags: defaultPresetTags,
-          userCustomTags: userCustomTags,
-          selectedFilterTag: selectedFilterTag,
-          onTagSelected: onTagSelected,
-        ),
-        Expanded(
-          child: isCalendarView
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        children: [
+          // 1. Top Emotion Weather Card with Overlapping Cat
+          EmotionWeatherCard(
+            selectedMonth: calendarSelectedMonth,
+            diaries: diaries,
+          ),
+
+          // 2. Pastel Tag Filter Bar
+          TagFilterBar(
+            defaultPresetTags: defaultPresetTags,
+            userCustomTags: userCustomTags,
+            selectedFilterTag: selectedFilterTag,
+            onTagSelected: onTagSelected,
+          ),
+
+          // 3. Calendar View or Timeline List
+          isCalendarView
               ? CalendarGridView(
                   diaries: filteredDiaries,
                   selectedMonth: calendarSelectedMonth,
@@ -69,28 +85,41 @@ class DiariesTab extends StatelessWidget {
                   onDateSelected: onDateSelected,
                   onRetroactiveRecord: onRetroactiveRecord,
                   onDeleteDiary: onDeleteDiary,
+                  onTrendTap: onTrendTap,
                 )
               : _buildTimelineListView(context, filteredDiaries, tc, l10n),
-        ),
-      ],
+
+          // 4. Bottom Sleeping Cat Quote Banner & CTA Button
+          BottomQuoteBanner(
+            selectedDate: calendarSelectedDate,
+            onRecordTap: onRecordTap,
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 
   Widget _buildTimelineListView(
       BuildContext context, List<MoodDiaryModel> list, ThemeColors tc, AppLocalizations? l10n) {
     if (list.isEmpty) {
-      return Center(
-        child: Text(
-          selectedFilterTag == null
-              ? (l10n?.noDiariesYet ?? '还没有记录心情，点击右下角按钮写第一篇吧！')
-              : '没有找到标签为 "$selectedFilterTag" 的心情日记',
-          style: TextStyle(color: tc.textSecondary, fontSize: 14),
+      return Padding(
+        padding: const EdgeInsets.all(32),
+        child: Center(
+          child: Text(
+            selectedFilterTag == null
+                ? (l10n?.noDiariesYet ?? '还没有记录心情，点击下方按钮写第一篇吧！')
+                : '没有找到标签为 "$selectedFilterTag" 的心情日记',
+            style: TextStyle(color: tc.textSecondary, fontSize: 14),
+          ),
         ),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: list.length,
       itemBuilder: (ctx, idx) {
         final item = list[idx];

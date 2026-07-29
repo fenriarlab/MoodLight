@@ -23,16 +23,20 @@ class TagFilterBar extends StatelessWidget {
     final allAvailableTags = [...defaultPresetTags, ...userCustomTags];
 
     return Container(
-      height: 44,
+      height: 48,
       padding: const EdgeInsets.symmetric(vertical: 4),
-      color: tc.surface,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           Padding(
-            padding: const EdgeInsets.only(right: 6),
+            padding: const EdgeInsets.only(right: 8),
             child: FilterChip(
+              avatar: Icon(
+                Icons.sentiment_satisfied_alt,
+                size: 14,
+                color: selectedFilterTag == null ? Colors.white : tc.accent,
+              ),
               label: Text(l10n?.filterAll ?? '全部'),
               selected: selectedFilterTag == null,
               onSelected: (bool selected) {
@@ -42,17 +46,21 @@ class TagFilterBar extends StatelessWidget {
               checkmarkColor: Colors.white,
               labelStyle: TextStyle(
                 fontSize: 12,
-                color: selectedFilterTag == null ? Colors.white : tc.textSecondary,
-                fontWeight: selectedFilterTag == null ? FontWeight.bold : FontWeight.normal,
+                color: selectedFilterTag == null ? Colors.white : tc.textPrimary,
+                fontWeight: selectedFilterTag == null ? FontWeight.bold : FontWeight.w500,
               ),
-              backgroundColor: tc.elevated,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              backgroundColor: tc.isDark ? const Color(0xFF2A2E37) : const Color(0xFFFAF6FF),
+              side: BorderSide(
+                color: selectedFilterTag == null ? tc.accent : (tc.isDark ? const Color(0xFF3F3B54) : const Color(0xFFEADBFF)),
+                width: 1,
+              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
             ),
           ),
           ...allAvailableTags.map((tag) {
             final isSelected = selectedFilterTag == tag;
             return Padding(
-              padding: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.only(right: 8),
               child: FilterChip(
                 label: Text(tag),
                 selected: isSelected,
@@ -63,11 +71,15 @@ class TagFilterBar extends StatelessWidget {
                 checkmarkColor: Colors.white,
                 labelStyle: TextStyle(
                   fontSize: 12,
-                  color: isSelected ? Colors.white : tc.textSecondary,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected ? Colors.white : tc.textPrimary,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                 ),
-                backgroundColor: tc.elevated,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                backgroundColor: tc.isDark ? const Color(0xFF2A2E37) : const Color(0xFFFAF6FF),
+                side: BorderSide(
+                  color: isSelected ? tc.accent : (tc.isDark ? const Color(0xFF3F3B54) : const Color(0xFFEADBFF)),
+                  width: 1,
+                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
               ),
             );
           }).toList(),

@@ -61,4 +61,33 @@ class MoodCalculator {
     }
     return result;
   }
+
+  static String getEmotionWeatherTitle(double avgScore) {
+    if (avgScore >= 3.0) return '☀️ 晴空万里';
+    if (avgScore >= 1.5) return '⛅ 多云转晴';
+    if (avgScore >= 0.0) return '🌤️ 微风拂面';
+    if (avgScore >= -2.0) return '🌧️ 偶尔阵雨';
+    return '🌩️ 阴雨连绵';
+  }
+
+  static String getEmotionWeatherSubtitle(double avgScore) {
+    if (avgScore >= 3.0) return '整体心情非常阳光欢快 🌟';
+    if (avgScore >= 1.5) return '整体心情平稳向好 ✨';
+    if (avgScore >= 0.0) return '整体心情平静恬淡 🌿';
+    if (avgScore >= -2.0) return '小有波折，记得多休息 ☕';
+    return '释放压力，抱抱自己 🫂';
+  }
+
+  static String getMostFrequentTag(List<MoodDiaryModel> diaries) {
+    if (diaries.isEmpty) return '🌱 平静';
+    final Map<String, int> counts = {};
+    for (var d in diaries) {
+      for (var t in d.tags) {
+        counts[t] = (counts[t] ?? 0) + 1;
+      }
+    }
+    if (counts.isEmpty) return '🌱 平静';
+    var sorted = counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return sorted.first.key;
+  }
 }
