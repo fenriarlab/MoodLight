@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
 import '../../data/models/mood_diary_model.dart';
@@ -24,10 +25,39 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
   DateTime _calendarSelectedMonth = DateTime.now();
   DateTime _calendarSelectedDate = DateTime.now();
 
+  // Custom Tags State
+  static const List<String> _defaultPresetTags = [
+    '💼 工作', '📚 学习', '🏠 家庭', '❤️ 恋爱',
+    '🍔 美食', '🏃 运动', '🎮 娱乐', '😴 睡眠',
+  ];
+  List<String> _userCustomTags = [];
+  String? _selectedFilterTag;
+
   @override
   void initState() {
     super.initState();
+    _loadCustomTags();
     _loadDiaries();
+  }
+
+  Future<void> _loadCustomTags() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userCustomTags = prefs.getStringList('user_custom_tags') ?? [];
+    });
+  }
+
+  Future<void> _saveCustomTag(String newTag) async {
+    final trimmed = newTag.trim();
+    if (trimmed.isEmpty) return;
+    if (!_defaultPresetTags.contains(trimmed) && !_userCustomTags.contains(trimmed)) {
+      final prefs = await SharedPreferences.getInstance();
+      final updated = [..._userCustomTags, trimmed];
+      await prefs.setStringList('user_custom_tags', updated);
+      setState(() {
+        _userCustomTags = updated;
+      });
+    }
   }
 
   Future<void> _loadDiaries() async {
@@ -138,28 +168,98 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_isCalendarView) {
-      return _buildCalendarView();
-    } else {
-      return _buildTimelineListView();
-    }
+    final filteredDiaries = _selectedFilterTag == null
+        ? _diaries
+        : _diaries.where((d) => d.tags.contains(_selectedFilterTag)).toList();
+
+    return Column(
+      children: [
+        _buildTagFilterBar(),
+        Expanded(
+          child: _isCalendarView
+              ? _buildCalendarView(filteredDiaries)
+              : _buildTimelineListView(filteredDiaries),
+        ),
+      ],
+    );
   }
 
-  Widget _buildTimelineListView() {
-    if (_diaries.isEmpty) {
-      return const Center(
+  Widget _buildTagFilterBar() {
+    final allAvailableTags = [..._defaultPresetTags, ..._userCustomTags];
+
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      color: AppColors.darkSurface,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: FilterChip(
+              label: const Text('全部'),
+              selected: _selectedFilterTag == null,
+              onSelected: (bool selected) {
+                setState(() => _selectedFilterTag = null);
+              },
+              selectedColor: AppColors.primary,
+              checkmarkColor: Colors.white,
+              labelStyle: TextStyle(
+                fontSize: 12,
+                color: _selectedFilterTag == null ? Colors.white : AppColors.textSecondary,
+                fontWeight: _selectedFilterTag == null ? FontWeight.bold : FontWeight.normal,
+              ),
+              backgroundColor: AppColors.darkElevated,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          ),
+          ...allAvailableTags.map((tag) {
+            final isSelected = _selectedFilterTag == tag;
+            return Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: FilterChip(
+                label: Text(tag),
+                selected: isSelected,
+                onSelected: (bool selected) {
+                  setState(() {
+                    _selectedFilterTag = selected ? tag : null;
+                  });
+                },
+                selectedColor: AppColors.primary,
+                checkmarkColor: Colors.white,
+                labelStyle: TextStyle(
+                  fontSize: 12,
+                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                backgroundColor: AppColors.darkElevated,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineListView(List<MoodDiaryModel> diaries) {
+    if (diaries.isEmpty) {
+      return Center(
         child: Text(
-          '还没有记录心情，点击右下角按钮写第一篇吧！',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+          _selectedFilterTag == null
+              ? '还没有记录心情，点击右下角按钮写第一篇吧！'
+              : '没有找到标签为 "$_selectedFilterTag" 的心情日记',
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
       );
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: _diaries.length,
+      itemCount: diaries.length,
       itemBuilder: (ctx, idx) {
-        final item = _diaries[idx];
+        final item = diaries[idx];
         return _buildDiaryCard(item);
       },
     );
@@ -210,24 +310,45 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
               const SizedBox(height: 12),
               Text(item.content, style: const TextStyle(fontSize: 15, color: AppColors.textPrimary, height: 1.4)),
             ],
+            if (item.tags.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: item.tags.map((tag) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 0.5),
+                    ),
+                    child: Text(
+                      tag,
+                      style: const TextStyle(fontSize: 11, color: AppColors.primaryLight, fontWeight: FontWeight.w500),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCalendarView() {
+  Widget _buildCalendarView(List<MoodDiaryModel> diaries) {
     final year = _calendarSelectedMonth.year;
     final month = _calendarSelectedMonth.month;
     final daysInMonth = DateUtils.getDaysInMonth(year, month);
     final firstWeekday = DateTime(year, month, 1).weekday % 7; // Sunday = 0
 
-    final groupedMap = MoodCalculator.groupDiariesByDate(_diaries);
+    final groupedMap = MoodCalculator.groupDiariesByDate(diaries);
     final now = DateTime.now();
     final isNotCurrentMonth = _calendarSelectedMonth.year != now.year || _calendarSelectedMonth.month != now.month;
 
     // Filter month diaries for summary
-    final monthDiaries = _diaries.where((d) => d.createdAt.year == year && d.createdAt.month == month).toList();
+    final monthDiaries = diaries.where((d) => d.createdAt.year == year && d.createdAt.month == month).toList();
     final monthAvgScore = MoodCalculator.calculateOverallAverage(monthDiaries);
 
     final selectedDateKey = MoodCalculator.formatDateKey(_calendarSelectedDate);
@@ -377,7 +498,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
               Color bgColor = AppColors.darkElevated.withOpacity(0.3);
 
               if (dayDiaries.isNotEmpty) {
-                // 按时间正序排列（早晨在上/左，晚间在下/右），使渐变方向从左上（时间靠前）平滑过渡至右下（时间靠后）
+                // 按时间正序排列（早晨在上/左，晚间在下/右）
                 final chronological = dayDiaries.toList()..sort((a, b) => a.createdAt.compareTo(b.createdAt));
                 final colors = chronological.map((d) => AppColors.getMoodColor(d.score)).toList();
                 if (colors.length == 1) {
@@ -635,10 +756,49 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     );
   }
 
+  void _showAddCustomTagDialog(BuildContext context, Function(String) onAdded) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: AppColors.darkElevated,
+          title: const Text('添加自定义标签', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: '如：✈️ 旅行、🎨 绘画...',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('取消', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: () {
+                final text = controller.text.trim();
+                if (text.isNotEmpty) {
+                  onAdded(text);
+                }
+                Navigator.pop(ctx);
+              },
+              child: const Text('添加', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showRecordDiaryDialog(BuildContext context, {DateTime? defaultDate}) {
     double selectedScore = 0;
     final contentController = TextEditingController();
     final targetDate = defaultDate ?? DateTime.now();
+    final List<String> selectedTags = [];
 
     showModalBottomSheet(
       context: context,
@@ -654,6 +814,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
             final emoji = AppColors.getMoodEmoji(currentScoreInt);
             final moodText = AppColors.getMoodText(currentScoreInt);
             final moodColor = AppColors.getMoodColor(currentScoreInt);
+            final allAvailableTags = [..._defaultPresetTags, ..._userCustomTags];
 
             final isRetroactive = defaultDate != null &&
                 (defaultDate.year != DateTime.now().year ||
@@ -671,81 +832,136 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                 left: 20,
                 right: 20,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(titleText, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: Column(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(titleText, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(emoji, style: const TextStyle(fontSize: 48)),
+                          const SizedBox(height: 4),
+                          Text(moodText, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: moodColor)),
+                          Text("分数: ${currentScoreInt > 0 ? '+$currentScoreInt' : '$currentScoreInt'}", style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        ],
+                      ),
+                    ),
+                    Slider(
+                      value: selectedScore,
+                      min: -5,
+                      max: 5,
+                      divisions: 10,
+                      activeColor: moodColor,
+                      onChanged: (val) {
+                        setModalState(() {
+                          selectedScore = val;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('关联标签 (可多选):', style: TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
                       children: [
-                        Text(emoji, style: const TextStyle(fontSize: 48)),
-                        const SizedBox(height: 4),
-                        Text(moodText, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: moodColor)),
-                        Text("分数: ${currentScoreInt > 0 ? '+$currentScoreInt' : '$currentScoreInt'}", style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        ...allAvailableTags.map((tag) {
+                          final isSelected = selectedTags.contains(tag);
+                          return FilterChip(
+                            label: Text(tag),
+                            selected: isSelected,
+                            selectedColor: AppColors.primary,
+                            checkmarkColor: Colors.white,
+                            labelStyle: TextStyle(
+                              fontSize: 12,
+                              color: isSelected ? Colors.white : AppColors.textSecondary,
+                            ),
+                            backgroundColor: AppColors.darkSurface,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            onSelected: (bool selected) {
+                              setModalState(() {
+                                if (selected) {
+                                  selectedTags.add(tag);
+                                } else {
+                                  selectedTags.remove(tag);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                        ActionChip(
+                          avatar: const Icon(Icons.add, size: 14, color: AppColors.primaryLight),
+                          label: const Text('+ 自定义', style: TextStyle(fontSize: 12, color: AppColors.primaryLight)),
+                          backgroundColor: AppColors.darkSurface,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: const BorderSide(color: AppColors.primaryLight, width: 0.8),
+                          ),
+                          onPressed: () {
+                            _showAddCustomTagDialog(context, (newTag) async {
+                              await _saveCustomTag(newTag);
+                              setModalState(() {
+                                if (!selectedTags.contains(newTag)) {
+                                  selectedTags.add(newTag);
+                                }
+                              });
+                            });
+                          },
+                        ),
                       ],
                     ),
-                  ),
-                  Slider(
-                    value: selectedScore,
-                    min: -5,
-                    max: 5,
-                    divisions: 10,
-                    activeColor: moodColor,
-                    onChanged: (val) {
-                      setModalState(() {
-                        selectedScore = val;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: contentController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: '写下此刻的心情与故事...',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: contentController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        hintText: '写下此刻的心情与故事...',
+                        border: OutlineInputBorder(),
                       ),
-                      onPressed: () async {
-                        final now = DateTime.now();
-                        final recordTime = DateTime(
-                          targetDate.year,
-                          targetDate.month,
-                          targetDate.day,
-                          now.hour,
-                          now.minute,
-                          now.second,
-                        );
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        onPressed: () async {
+                          final now = DateTime.now();
+                          final recordTime = DateTime(
+                            targetDate.year,
+                            targetDate.month,
+                            targetDate.day,
+                            now.hour,
+                            now.minute,
+                            now.second,
+                          );
 
-                        final newDiary = MoodDiaryModel(
-                          id: "mood_${recordTime.millisecondsSinceEpoch}",
-                          score: currentScoreInt,
-                          moodEmoji: emoji,
-                          content: contentController.text.trim(),
-                          themeColor: '#4F7FFF',
-                          createdAt: recordTime,
-                        );
-                        await _repository.insertDiary(newDiary);
-                        Navigator.pop(ctx);
-                        _loadDiaries();
-                      },
-                      child: Text(
-                        isRetroactive ? '保存 ${defaultDate.month}月${defaultDate.day}日 心情' : '保存心情日记',
-                        style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          final newDiary = MoodDiaryModel(
+                            id: "mood_${recordTime.millisecondsSinceEpoch}",
+                            score: currentScoreInt,
+                            moodEmoji: emoji,
+                            content: contentController.text.trim(),
+                            themeColor: '#4F7FFF',
+                            tags: selectedTags,
+                            createdAt: recordTime,
+                          );
+                          await _repository.insertDiary(newDiary);
+                          Navigator.pop(ctx);
+                          _loadDiaries();
+                        },
+                        child: Text(
+                          isRetroactive ? '保存 ${defaultDate.month}月${defaultDate.day}日 心情' : '保存心情日记',
+                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
