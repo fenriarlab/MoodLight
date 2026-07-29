@@ -59,15 +59,16 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     });
   }
 
-  Future<void> _saveCustomTag(String newTag) async {
+  void _saveCustomTag(String newTag) {
     final trimmed = newTag.trim();
     if (trimmed.isEmpty) return;
     if (!_defaultPresetTags.contains(trimmed) && !_userCustomTags.contains(trimmed)) {
-      final prefs = await SharedPreferences.getInstance();
       final updated = [..._userCustomTags, trimmed];
-      await prefs.setStringList('user_custom_tags', updated);
       setState(() {
         _userCustomTags = updated;
+      });
+      SharedPreferences.getInstance().then((prefs) {
+        prefs.setStringList('user_custom_tags', updated);
       });
     }
   }

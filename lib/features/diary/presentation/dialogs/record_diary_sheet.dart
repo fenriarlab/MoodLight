@@ -126,13 +126,19 @@ void showRecordDiarySheet(
                           side: BorderSide(color: tc.accent, width: 0.8),
                         ),
                         onPressed: () {
-                          showAddCustomTagDialog(context, (newTag) async {
-                            onCustomTagAdded(newTag);
-                            setModalState(() {
-                              if (!selectedTags.contains(newTag)) {
-                                selectedTags.add(newTag);
-                              }
-                            });
+                          showAddCustomTagDialog(context, (newTag) {
+                            final trimmed = newTag.trim();
+                            if (trimmed.isNotEmpty) {
+                              onCustomTagAdded(trimmed);
+                              setModalState(() {
+                                if (!userCustomTags.contains(trimmed)) {
+                                  userCustomTags.add(trimmed);
+                                }
+                                if (!selectedTags.contains(trimmed)) {
+                                  selectedTags.add(trimmed);
+                                }
+                              });
+                            }
                           });
                         },
                       ),
