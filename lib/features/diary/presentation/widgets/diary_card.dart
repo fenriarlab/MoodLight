@@ -18,12 +18,15 @@ class DiaryCard extends StatelessWidget {
     final tc = ThemeColors.of(context);
     final moodColor = AppColors.getMoodColor(item.score);
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      color: tc.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: tc.divider, width: 1),
+      decoration: BoxDecoration(
+        color: tc.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: tc.isDark ? const Color(0xFF39334D) : const Color(0xFFEFE8FB),
+        ),
+        boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -71,13 +74,13 @@ class DiaryCard extends StatelessWidget {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: tc.accent.withOpacity(0.12),
+                      color: const Color(0xFF8C52EE).withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: tc.accent.withOpacity(0.3), width: 0.5),
+                      border: Border.all(color: const Color(0xFF8C52EE).withOpacity(0.3), width: 0.5),
                     ),
                     child: Text(
                       tag,
-                      style: TextStyle(fontSize: 11, color: tc.accent, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF8C52EE), fontWeight: FontWeight.w500),
                     ),
                   );
                 }).toList(),

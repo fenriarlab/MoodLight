@@ -29,49 +29,62 @@ class CalendarGridView extends StatelessWidget {
     this.onTrendTap,
   });
 
-  Gradient? _getPastelGradientForScore(int score, bool isDark) {
-    if (score >= 4) {
+  Gradient? _getPastelGradientForDiaries(List<MoodDiaryModel> dayDiaries, bool isDark) {
+    if (dayDiaries.isEmpty) return null;
+
+    if (dayDiaries.length == 1) {
+      final score = dayDiaries.first.score;
+      if (score >= 4) {
+        return LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF6B4A1D), const Color(0xFF8D5B28)]
+              : [const Color(0xFFFFF1A8), const Color(0xFFFFD54F)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      }
+      if (score >= 2) {
+        return LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF225024), const Color(0xFF388E3C)]
+              : [const Color(0xFFC8E6C9), const Color(0xFFA5D6A7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      }
+      if (score >= 0) {
+        return LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF4A3464), const Color(0xFF673AB7)]
+              : [const Color(0xFFE1BEE7), const Color(0xFFCE93D8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      }
+      if (score >= -2) {
+        return LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF1E4160), const Color(0xFF2196F3)]
+              : [const Color(0xFFBBDEFB), const Color(0xFF90CAF9)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      }
       return LinearGradient(
         colors: isDark
-            ? [const Color(0xFF6B4A1D), const Color(0xFF8D5B28)]
-            : [const Color(0xFFFFF1A8), const Color(0xFFFFD54F)],
+            ? [const Color(0xFF5E271D), const Color(0xFFE64A19)]
+            : [const Color(0xFFFFCCBC), const Color(0xFFFFAB91)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       );
     }
-    if (score >= 2) {
-      return LinearGradient(
-        colors: isDark
-            ? [const Color(0xFF225024), const Color(0xFF388E3C)]
-            : [const Color(0xFFC8E6C9), const Color(0xFFA5D6A7)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    }
-    if (score >= 0) {
-      return LinearGradient(
-        colors: isDark
-            ? [const Color(0xFF4A3464), const Color(0xFF673AB7)]
-            : [const Color(0xFFE1BEE7), const Color(0xFFCE93D8)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    }
-    if (score >= -2) {
-      return LinearGradient(
-        colors: isDark
-            ? [const Color(0xFF1E4160), const Color(0xFF2196F3)]
-            : [const Color(0xFFBBDEFB), const Color(0xFF90CAF9)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    }
+
+    // Multiple diaries per date: Combine colors for smooth gradient
+    final colors = dayDiaries.map((d) => AppColors.getMoodColor(d.score)).toList();
     return LinearGradient(
-      colors: isDark
-          ? [const Color(0xFF5E271D), const Color(0xFFE64A19)]
-          : [const Color(0xFFFFCCBC), const Color(0xFFFFAB91)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
+      colors: colors,
     );
   }
 
@@ -224,11 +237,8 @@ class CalendarGridView extends StatelessWidget {
 
                 final dayDiaries = groupedMap[dateKey] ?? [];
 
-                Gradient? cellGradient;
+                final cellGradient = _getPastelGradientForDiaries(dayDiaries, tc.isDark);
                 Color cellColor = tc.isDark ? const Color(0xFF242831) : const Color(0xFFFAF8FD);
-                if (dayDiaries.isNotEmpty) {
-                  cellGradient = _getPastelGradientForScore(dayDiaries.last.score, tc.isDark);
-                }
 
                 return InkWell(
                   onTap: () {
@@ -245,21 +255,17 @@ class CalendarGridView extends StatelessWidget {
                       color: cellGradient == null ? cellColor : null,
                       gradient: cellGradient,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFF8C52EE)
-                            : isToday
-                                ? const Color(0xFF8C52EE).withOpacity(0.5)
-                                : Colors.transparent,
-                        width: isSelected ? 2.5 : (isToday ? 1.5 : 0),
-                      ),
+                      // Soft Outer Glow Halo for Selected Date (No Hard Line Border)
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: const Color(0xFF8C52EE).withOpacity(0.35),
-                                blurRadius: 10,
-                                offset: const Offset(0, 2),
-                              )
+                                color: (dayDiaries.isNotEmpty
+                                        ? AppColors.getMoodColor(dayDiaries.last.score)
+                                        : const Color(0xFF8C52EE))
+                                    .withOpacity(0.65),
+                                blurRadius: 14,
+                                spreadRadius: 2,
+                              ),
                             ]
                           : null,
                     ),
@@ -292,14 +298,14 @@ class CalendarGridView extends StatelessWidget {
                             top: 3,
                             right: 3,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.4),
+                                color: Colors.black.withOpacity(0.45),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 '+${dayDiaries.length}',
-                                style: const TextStyle(fontSize: 7, color: Colors.white, fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ),

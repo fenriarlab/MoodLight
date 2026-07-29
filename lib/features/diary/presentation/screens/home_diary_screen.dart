@@ -6,6 +6,7 @@ import '../../../../core/constants/theme_colors.dart';
 import '../../data/models/mood_diary_model.dart';
 import '../../data/diary_repository.dart';
 import '../dialogs/record_diary_sheet.dart';
+import '../widgets/bottom_quote_banner.dart';
 import '../tabs/diaries_tab.dart';
 import '../tabs/stats_tab.dart';
 import '../tabs/settings_tab.dart';
@@ -209,7 +210,6 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                 await _repository.deleteDiary(diary.id);
                 _loadDiaries();
               },
-              onRecordTap: () => _showRecordSheet(defaultDate: _isCalendarView ? _calendarSelectedDate : null),
               onTrendTap: () => setState(() => _currentIndex = 1),
             ),
             StatsTab(diaries: _diaries),
@@ -221,28 +221,41 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() => _currentIndex = index);
-        },
-        backgroundColor: tc.isDark ? const Color(0xFF191724) : Colors.white,
-        indicatorColor: const Color(0xFF8C52EE).withOpacity(0.18),
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined, color: tc.textSecondary),
-            selectedIcon: const Icon(Icons.home_rounded, color: Color(0xFF8C52EE)),
-            label: '首页',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.show_chart_outlined, color: tc.textSecondary),
-            selectedIcon: const Icon(Icons.show_chart_rounded, color: Color(0xFF8C52EE)),
-            label: l10n?.tabStats ?? '趋势',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.pets_outlined, color: tc.textSecondary),
-            selectedIcon: const Icon(Icons.pets_rounded, color: Color(0xFF8C52EE)),
-            label: '我的',
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Sticky Bottom Quote Banner with Sleeping Cat & CTA Button (Only on Home/Diaries Tab)
+          if (_currentIndex == 0)
+            BottomQuoteBanner(
+              selectedDate: _calendarSelectedDate,
+              onRecordTap: () => _showRecordSheet(
+                defaultDate: _isCalendarView ? _calendarSelectedDate : null,
+              ),
+            ),
+          NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              setState(() => _currentIndex = index);
+            },
+            backgroundColor: tc.isDark ? const Color(0xFF191724) : Colors.white,
+            indicatorColor: const Color(0xFF8C52EE).withOpacity(0.18),
+            destinations: [
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined, color: tc.textSecondary),
+                selectedIcon: const Icon(Icons.home_rounded, color: Color(0xFF8C52EE)),
+                label: '首页',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.show_chart_outlined, color: tc.textSecondary),
+                selectedIcon: const Icon(Icons.show_chart_rounded, color: Color(0xFF8C52EE)),
+                label: l10n?.tabStats ?? '趋势',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.pets_outlined, color: tc.textSecondary),
+                selectedIcon: const Icon(Icons.pets_rounded, color: Color(0xFF8C52EE)),
+                label: '我的',
+              ),
+            ],
           ),
         ],
       ),

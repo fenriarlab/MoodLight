@@ -5,7 +5,6 @@ import '../../data/models/mood_diary_model.dart';
 import '../widgets/emotion_weather_card.dart';
 import '../widgets/tag_filter_bar.dart';
 import '../widgets/calendar_grid_view.dart';
-import '../widgets/bottom_quote_banner.dart';
 import '../widgets/diary_card.dart';
 
 class DiariesTab extends StatelessWidget {
@@ -22,7 +21,6 @@ class DiariesTab extends StatelessWidget {
   final Function(DateTime) onDateSelected;
   final Function(DateTime) onRetroactiveRecord;
   final Function(MoodDiaryModel) onDeleteDiary;
-  final VoidCallback onRecordTap;
   final VoidCallback? onTrendTap;
 
   const DiariesTab({
@@ -40,7 +38,6 @@ class DiariesTab extends StatelessWidget {
     required this.onDateSelected,
     required this.onRetroactiveRecord,
     required this.onDeleteDiary,
-    required this.onRecordTap,
     this.onTrendTap,
   });
 
@@ -89,11 +86,6 @@ class DiariesTab extends StatelessWidget {
                 )
               : _buildTimelineListView(context, filteredDiaries, tc, l10n),
 
-          // 4. Bottom Sleeping Cat Quote Banner & CTA Button
-          BottomQuoteBanner(
-            selectedDate: calendarSelectedDate,
-            onRecordTap: onRecordTap,
-          ),
           const SizedBox(height: 16),
         ],
       ),
