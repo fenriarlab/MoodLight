@@ -49,28 +49,31 @@ class _MoodLightAppState extends State<MoodLightApp> {
     });
   }
 
-  void updateAccentColor(Color color) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('user_accent_color', color.value);
+  void updateAccentColor(Color color) {
     setState(() {
       _accentColor = color;
     });
-  }
-
-  void updateLanguage(String lang) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_language', lang);
-    setState(() {
-      _language = lang;
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setInt('user_accent_color', color.value);
     });
   }
 
-  void updateThemeMode(ThemeMode mode) async {
-    final prefs = await SharedPreferences.getInstance();
-    final modeStr = mode == ThemeMode.light ? 'light' : mode == ThemeMode.system ? 'system' : 'dark';
-    await prefs.setString('user_theme_mode', modeStr);
+  void updateLanguage(String lang) {
+    setState(() {
+      _language = lang;
+    });
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setString('user_language', lang);
+    });
+  }
+
+  void updateThemeMode(ThemeMode mode) {
     setState(() {
       _themeMode = mode;
+    });
+    SharedPreferences.getInstance().then((prefs) {
+      final modeStr = mode == ThemeMode.light ? 'light' : mode == ThemeMode.system ? 'system' : 'dark';
+      prefs.setString('user_theme_mode', modeStr);
     });
   }
 
