@@ -23,13 +23,13 @@ class BottomQuoteBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         gradient: tc.isDark
-            ? LinearGradient(
-                colors: [const Color(0xFF2B213F), const Color(0xFF211A33)],
+            ? const LinearGradient(
+                colors: [Color(0xFF2B213F), Color(0xFF211A33)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               )
-            : LinearGradient(
-                colors: [const Color(0xFFFAF4FF), const Color(0xFFF3E8FF)],
+            : const LinearGradient(
+                colors: [Color(0xFFFAF4FF), Color(0xFFF3E8FF)],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
@@ -38,6 +38,7 @@ class BottomQuoteBanner extends StatelessWidget {
           color: tc.isDark ? const Color(0xFF3F335D) : const Color(0xFFEADBFF),
           width: 1,
         ),
+        boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
       ),
       child: Row(
         children: [
@@ -46,6 +47,8 @@ class BottomQuoteBanner extends StatelessWidget {
             'assets/images/cat_footer.png',
             height: 52,
             fit: BoxFit.contain,
+            colorBlendMode: tc.isDark ? BlendMode.dstIn : BlendMode.multiply,
+            color: tc.isDark ? null : Colors.white.withOpacity(0.95),
             errorBuilder: (ctx, err, stack) {
               return const Text('🐱', style: TextStyle(fontSize: 32));
             },
@@ -79,32 +82,30 @@ class BottomQuoteBanner extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Text('🐾', style: TextStyle(fontSize: 10, color: tc.accent)),
+                    const Text('🐾', style: TextStyle(fontSize: 10, color: Color(0xFF8C52EE))),
                   ],
                 ),
               ],
             ),
           ),
 
-          // Large CTA Button
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: tc.accent,
-              foregroundColor: Colors.white,
-              elevation: 4,
-              shadowColor: tc.accent.withOpacity(0.4),
+          // Large Gradient CTA Button with Ambient Shadow
+          GestureDetector(
+            onTap: onRecordTap,
+            child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              decoration: BoxDecoration(
+                gradient: ThemeColors.purpleGradient,
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: ThemeColors.purpleGlowShadow(),
               ),
-            ),
-            onPressed: onRecordTap,
-            child: Text(
-              buttonText,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              child: Text(
+                buttonText,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),

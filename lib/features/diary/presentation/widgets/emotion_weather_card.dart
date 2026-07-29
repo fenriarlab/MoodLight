@@ -54,13 +54,7 @@ class EmotionWeatherCard extends StatelessWidget {
                 color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFE5D8FF),
                 width: 1,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: tc.isDark ? Colors.black.withOpacity(0.3) : const Color(0xFF9D75F0).withOpacity(0.12),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,6 +207,8 @@ class EmotionWeatherCard extends StatelessWidget {
               'assets/images/cat_header.png',
               height: 72,
               fit: BoxFit.contain,
+              colorBlendMode: tc.isDark ? BlendMode.dstIn : BlendMode.multiply,
+              color: tc.isDark ? null : Colors.white.withOpacity(0.95),
               errorBuilder: (ctx, err, stack) {
                 return const Text('🐱', style: TextStyle(fontSize: 40));
               },

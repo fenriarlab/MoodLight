@@ -29,12 +29,50 @@ class CalendarGridView extends StatelessWidget {
     this.onTrendTap,
   });
 
-  Color _getPastelColorForScore(int score, bool isDark) {
-    if (score >= 4) return isDark ? const Color(0xFF8D5B28) : const Color(0xFFFFD54F); // Energetic Gold
-    if (score >= 2) return isDark ? const Color(0xFF2E6930) : const Color(0xFFAED581); // Happy Green
-    if (score >= 0) return isDark ? const Color(0xFF5B3E7A) : const Color(0xFFD1C4E9); // Calm Purple
-    if (score >= -2) return isDark ? const Color(0xFF28547A) : const Color(0xFF90CAF9); // Sad Blue
-    return isDark ? const Color(0xFF7A3628) : const Color(0xFFFFAB91); // Very Low Orange-Red
+  Gradient? _getPastelGradientForScore(int score, bool isDark) {
+    if (score >= 4) {
+      return LinearGradient(
+        colors: isDark
+            ? [const Color(0xFF6B4A1D), const Color(0xFF8D5B28)]
+            : [const Color(0xFFFFF1A8), const Color(0xFFFFD54F)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+    if (score >= 2) {
+      return LinearGradient(
+        colors: isDark
+            ? [const Color(0xFF225024), const Color(0xFF388E3C)]
+            : [const Color(0xFFC8E6C9), const Color(0xFFA5D6A7)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+    if (score >= 0) {
+      return LinearGradient(
+        colors: isDark
+            ? [const Color(0xFF4A3464), const Color(0xFF673AB7)]
+            : [const Color(0xFFE1BEE7), const Color(0xFFCE93D8)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+    if (score >= -2) {
+      return LinearGradient(
+        colors: isDark
+            ? [const Color(0xFF1E4160), const Color(0xFF2196F3)]
+            : [const Color(0xFFBBDEFB), const Color(0xFF90CAF9)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+    return LinearGradient(
+      colors: isDark
+          ? [const Color(0xFF5E271D), const Color(0xFFE64A19)]
+          : [const Color(0xFFFFCCBC), const Color(0xFFFFAB91)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
   }
 
   @override
@@ -60,14 +98,10 @@ class CalendarGridView extends StatelessWidget {
       decoration: BoxDecoration(
         color: tc.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: tc.divider),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(tc.isDark ? 0.2 : 0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(
+          color: tc.isDark ? const Color(0xFF39334D) : const Color(0xFFEFE8FB),
+        ),
+        boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
       ),
       child: Column(
         children: [
@@ -126,17 +160,17 @@ class CalendarGridView extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: tc.accent.withOpacity(0.12),
+                        color: const Color(0xFF8C52EE).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.show_chart, size: 14, color: tc.accent),
+                          const Icon(Icons.show_chart, size: 14, color: Color(0xFF8C52EE)),
                           const SizedBox(width: 4),
-                          Text(
+                          const Text(
                             '情绪趋势',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: tc.accent),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF8C52EE)),
                           ),
                         ],
                       ),
@@ -158,7 +192,7 @@ class CalendarGridView extends StatelessWidget {
                 Text(l10n?.weekdayWed ?? '三', style: TextStyle(color: tc.textSecondary, fontSize: 13)),
                 Text(l10n?.weekdayThu ?? '四', style: TextStyle(color: tc.textSecondary, fontSize: 13)),
                 Text(l10n?.weekdayFri ?? '五', style: TextStyle(color: tc.textSecondary, fontSize: 13)),
-                Text(l10n?.weekdaySat ?? '六', style: TextStyle(color: tc.accent, fontSize: 13, fontWeight: FontWeight.bold)),
+                Text(l10n?.weekdaySat ?? '六', style: const TextStyle(color: Color(0xFF8C52EE), fontSize: 13, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -190,9 +224,10 @@ class CalendarGridView extends StatelessWidget {
 
                 final dayDiaries = groupedMap[dateKey] ?? [];
 
-                Color cellColor = tc.isDark ? const Color(0xFF2A2E37) : const Color(0xFFF4F6F9);
+                Gradient? cellGradient;
+                Color cellColor = tc.isDark ? const Color(0xFF242831) : const Color(0xFFFAF8FD);
                 if (dayDiaries.isNotEmpty) {
-                  cellColor = _getPastelColorForScore(dayDiaries.last.score, tc.isDark);
+                  cellGradient = _getPastelGradientForScore(dayDiaries.last.score, tc.isDark);
                 }
 
                 return InkWell(
@@ -203,25 +238,26 @@ class CalendarGridView extends StatelessWidget {
                     onDateSelected(thisDate);
                     onRetroactiveRecord(thisDate);
                   },
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(16),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
                     decoration: BoxDecoration(
-                      color: cellColor,
-                      borderRadius: BorderRadius.circular(14),
+                      color: cellGradient == null ? cellColor : null,
+                      gradient: cellGradient,
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isSelected
-                            ? tc.accent
+                            ? const Color(0xFF8C52EE)
                             : isToday
-                                ? tc.accent.withOpacity(0.6)
+                                ? const Color(0xFF8C52EE).withOpacity(0.5)
                                 : Colors.transparent,
                         width: isSelected ? 2.5 : (isToday ? 1.5 : 0),
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: tc.accent.withOpacity(0.35),
-                                blurRadius: 8,
+                                color: const Color(0xFF8C52EE).withOpacity(0.35),
+                                blurRadius: 10,
                                 offset: const Offset(0, 2),
                               )
                             ]
@@ -238,7 +274,7 @@ class CalendarGridView extends StatelessWidget {
                               fontSize: 10,
                               fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.w500,
                               color: dayDiaries.isNotEmpty
-                                  ? (tc.isDark ? Colors.white70 : const Color(0xFF4A5568))
+                                  ? (tc.isDark ? Colors.white : const Color(0xFF332057))
                                   : tc.textSecondary,
                             ),
                           ),
@@ -295,10 +331,10 @@ class CalendarGridView extends StatelessWidget {
                     TextButton.icon(
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
                       onPressed: () => onRetroactiveRecord(selectedDate),
-                      icon: Icon(Icons.add_circle_outline, size: 14, color: tc.accent),
+                      icon: const Icon(Icons.add_circle_outline, size: 14, color: Color(0xFF8C52EE)),
                       label: Text(
                         l10n?.retroactiveButton("${selectedDate.month}/${selectedDate.day}") ?? "补记 ${selectedDate.month}/${selectedDate.day}",
-                        style: TextStyle(color: tc.accent, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: Color(0xFF8C52EE), fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

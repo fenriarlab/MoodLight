@@ -52,4 +52,32 @@ class ThemeColors {
       );
     }
   }
+
+  static const LinearGradient purpleGradient = LinearGradient(
+    colors: [Color(0xFF8C52EE), Color(0xFFA259FE)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static List<BoxShadow> cardAmbientShadow(bool isDark) {
+    return [
+      BoxShadow(
+        color: isDark ? Colors.black.withOpacity(0.35) : const Color(0xFF9D75F0).withOpacity(0.18),
+        blurRadius: 24,
+        spreadRadius: 0,
+        offset: const Offset(0, 8),
+      ),
+    ];
+  }
+
+  static List<BoxShadow> purpleGlowShadow() {
+    return [
+      BoxShadow(
+        color: const Color(0xFF8C52EE).withOpacity(0.38),
+        blurRadius: 14,
+        spreadRadius: 0,
+        offset: const Offset(0, 4),
+      ),
+    ];
+  }
 }
