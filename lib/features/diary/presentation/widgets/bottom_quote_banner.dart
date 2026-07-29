@@ -14,117 +14,109 @@ class BottomQuoteBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
-    final now = DateTime.now();
-    final isToday = selectedDate.year == now.year && selectedDate.month == now.month && selectedDate.day == now.day;
-    final buttonText = isToday ? '+ 记录今天' : '+ 补记心情';
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        gradient: tc.isDark
-            ? const LinearGradient(
-                colors: [Color(0xFF2B213F), Color(0xFF211A33)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              )
-            : const LinearGradient(
-                colors: [Color(0xFFFAF4FF), Color(0xFFF3E8FF)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: tc.isDark ? const Color(0xFF3F335D) : const Color(0xFFEADBFF),
-          width: 1,
-        ),
-        boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
-      ),
-      child: Row(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          // Cat Sleeping Image
-          Image.asset(
-            'assets/images/cat_footer.png',
-            height: 52,
-            fit: BoxFit.contain,
-            errorBuilder: (ctx, err, stack) {
-              return const Text('🐱', style: TextStyle(fontSize: 32));
-            },
-          ),
-          const SizedBox(width: 8),
-
-          // Quote Text
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '“ 每一种心情',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: tc.isDark ? const Color(0xFFD6CBF5) : const Color(0xFF5E4988),
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Text(
-                      '都值得被温柔对待~ ”',
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Top Layer: Speech Bubble & Cat Mascot Leaning Over
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // Speech Bubble "想对我说点什么吗？"
+                  Container(
+                    margin: const EdgeInsets.only(left: 12, bottom: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: tc.isDark ? const Color(0xFF2C253B) : Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(4),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF9D75F0).withOpacity(0.18),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      '想对我说点什么吗？',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: tc.isDark ? const Color(0xFFD6CBF5) : const Color(0xFF5E4988),
-                        fontStyle: FontStyle.italic,
+                        color: tc.textPrimary,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    const Text('🐾', style: TextStyle(fontSize: 10, color: Color(0xFF8C52EE))),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Large 3D Glass Specular Highlight CTA Button
-          GestureDetector(
-            onTap: onRecordTap,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFA855F7), Color(0xFF7E22CE)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white.withOpacity(0.45),
-                    width: 1.2,
                   ),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF8E4BF6).withOpacity(0.48),
-                    blurRadius: 16,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 6),
+
+                  // Cat Header Mascot (Paws overlapping top edge of purple button)
+                  Transform.translate(
+                    offset: const Offset(-20, 10), // Push down so paws overlap the button border
+                    child: Image.asset(
+                      'assets/images/cat_header.png',
+                      height: 65,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ],
               ),
-              child: Text(
-                buttonText,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
+
+              // Bottom Layer: Large Purple Pill CTA Button "✏️ 记录心情"
+              GestureDetector(
+                onTap: onRecordTap,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF9333EA), Color(0xFF7E22CE)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.white.withOpacity(0.45),
+                        width: 1.2,
+                      ),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8E4BF6).withOpacity(0.5),
+                        blurRadius: 18,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.edit, color: Colors.white, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        '记录心情',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
