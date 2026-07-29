@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
+import '../../../../main.dart';
 import '../../data/models/mood_diary_model.dart';
 import '../../data/diary_repository.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -37,6 +41,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
   void initState() {
     super.initState();
     _loadCustomTags();
+    _loadDefaultViewPreference();
     _loadDiaries();
   }
 
@@ -44,6 +49,14 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _userCustomTags = prefs.getStringList('user_custom_tags') ?? [];
+    });
+  }
+
+  Future<void> _loadDefaultViewPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final defaultCalendar = prefs.getBool('user_default_view_calendar') ?? true;
+    setState(() {
+      _isCalendarView = defaultCalendar;
     });
   }
 
@@ -70,6 +83,10 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final appState = MoodLightApp.of(context);
+    final accentColor = appState?.accentColor ?? AppColors.primary;
+
     return Scaffold(
       appBar: AppBar(
         title: FittedBox(
@@ -78,7 +95,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('✨ MoodLight 心情日记'),
+              Text('✨ ${l10n?.appTitle ?? "MoodLight 心情日记"}'),
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -87,14 +104,14 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.moodVeryHappy.withOpacity(0.4)),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.shield_outlined, size: 12, color: AppColors.moodVeryHappy),
-                    SizedBox(width: 3),
+                    const Icon(Icons.shield_outlined, size: 12, color: AppColors.moodVeryHappy),
+                    const SizedBox(width: 3),
                     Text(
-                      '100% 离线安全',
-                      style: TextStyle(fontSize: 10, color: AppColors.moodVeryHappy, fontWeight: FontWeight.w500),
+                      l10n?.offlineBadge ?? '100% 离线安全',
+                      style: const TextStyle(fontSize: 10, color: AppColors.moodVeryHappy, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -105,10 +122,12 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
         actions: [
           if (_currentIndex == 0)
             IconButton(
-              tooltip: _isCalendarView ? '切换为列表视图' : '切换为日历视图',
+              tooltip: _isCalendarView
+                  ? (l10n?.viewTimeline ?? '切换为列表视图')
+                  : (l10n?.viewCalendar ?? '切换为日历视图'),
               icon: Icon(
                 _isCalendarView ? Icons.receipt_long : Icons.calendar_month,
-                color: AppColors.primaryLight,
+                color: accentColor,
               ),
               onPressed: () {
                 setState(() => _isCalendarView = !_isCalendarView);
@@ -126,12 +145,12 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showRecordDiaryDialog(context, defaultDate: _isCalendarView ? _calendarSelectedDate : null),
-        backgroundColor: AppColors.primary,
+        backgroundColor: accentColor,
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text(
           _isCalendarView && (_calendarSelectedDate.year != DateTime.now().year || _calendarSelectedDate.month != DateTime.now().month || _calendarSelectedDate.day != DateTime.now().day)
               ? '补记心情'
-              : '记心情',
+              : (l10n?.recordMood ?? '记心情'),
           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
@@ -141,22 +160,22 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
           setState(() => _currentIndex = index);
         },
         backgroundColor: AppColors.darkSurface,
-        indicatorColor: AppColors.primary.withOpacity(0.2),
-        destinations: const [
+        indicatorColor: accentColor.withOpacity(0.2),
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.book_outlined, color: AppColors.textSecondary),
-            selectedIcon: Icon(Icons.book, color: AppColors.primaryLight),
-            label: '日记',
+            icon: const Icon(Icons.book_outlined, color: AppColors.textSecondary),
+            selectedIcon: Icon(Icons.book, color: accentColor),
+            label: l10n?.tabDiaries ?? '日记',
           ),
           NavigationDestination(
-            icon: Icon(Icons.show_chart_outlined, color: AppColors.textSecondary),
-            selectedIcon: Icon(Icons.show_chart, color: AppColors.primaryLight),
-            label: '趋势',
+            icon: const Icon(Icons.show_chart_outlined, color: AppColors.textSecondary),
+            selectedIcon: Icon(Icons.show_chart, color: accentColor),
+            label: l10n?.tabStats ?? '趋势',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined, color: AppColors.textSecondary),
-            selectedIcon: Icon(Icons.settings, color: AppColors.primaryLight),
-            label: '设置',
+            icon: const Icon(Icons.settings_outlined, color: AppColors.textSecondary),
+            selectedIcon: Icon(Icons.settings, color: accentColor),
+            label: l10n?.tabSettings ?? '设置',
           ),
         ],
       ),
@@ -186,6 +205,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
 
   Widget _buildTagFilterBar() {
     final allAvailableTags = [..._defaultPresetTags, ..._userCustomTags];
+    final accentColor = MoodLightApp.of(context)?.accentColor ?? AppColors.primary;
 
     return Container(
       height: 44,
@@ -203,7 +223,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
               onSelected: (bool selected) {
                 setState(() => _selectedFilterTag = null);
               },
-              selectedColor: AppColors.primary,
+              selectedColor: accentColor,
               checkmarkColor: Colors.white,
               labelStyle: TextStyle(
                 fontSize: 12,
@@ -226,7 +246,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                     _selectedFilterTag = selected ? tag : null;
                   });
                 },
-                selectedColor: AppColors.primary,
+                selectedColor: accentColor,
                 checkmarkColor: Colors.white,
                 labelStyle: TextStyle(
                   fontSize: 12,
@@ -244,11 +264,12 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
   }
 
   Widget _buildTimelineListView(List<MoodDiaryModel> diaries) {
+    final l10n = AppLocalizations.of(context);
     if (diaries.isEmpty) {
       return Center(
         child: Text(
           _selectedFilterTag == null
-              ? '还没有记录心情，点击右下角按钮写第一篇吧！'
+              ? (l10n?.noDiariesYet ?? '还没有记录心情，点击右下角按钮写第一篇吧！')
               : '没有找到标签为 "$_selectedFilterTag" 的心情日记',
           style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
@@ -267,6 +288,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
 
   Widget _buildDiaryCard(MoodDiaryModel item) {
     final moodColor = AppColors.getMoodColor(item.score);
+    final accentColor = MoodLightApp.of(context)?.accentColor ?? AppColors.primary;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -319,13 +341,13 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.12),
+                      color: accentColor.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 0.5),
+                      border: Border.all(color: accentColor.withOpacity(0.3), width: 0.5),
                     ),
                     child: Text(
                       tag,
-                      style: const TextStyle(fontSize: 11, color: AppColors.primaryLight, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 11, color: accentColor, fontWeight: FontWeight.w500),
                     ),
                   );
                 }).toList(),
@@ -338,6 +360,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
   }
 
   Widget _buildCalendarView(List<MoodDiaryModel> diaries) {
+    final accentColor = MoodLightApp.of(context)?.accentColor ?? AppColors.primary;
     final year = _calendarSelectedMonth.year;
     final month = _calendarSelectedMonth.month;
     final daysInMonth = DateUtils.getDaysInMonth(year, month);
@@ -396,7 +419,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                         DateFormat('yyyy 年 MM 月').format(_calendarSelectedMonth),
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                       ),
-                      const Icon(Icons.arrow_drop_down, color: AppColors.primaryLight),
+                      Icon(Icons.arrow_drop_down, color: accentColor),
                     ],
                   ),
                 ),
@@ -413,8 +436,8 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                           _calendarSelectedDate = now;
                         });
                       },
-                      icon: const Icon(Icons.today, size: 14, color: AppColors.primaryLight),
-                      label: const Text('回到今天', style: TextStyle(color: AppColors.primaryLight, fontSize: 11, fontWeight: FontWeight.bold)),
+                      icon: Icon(Icons.today, size: 14, color: accentColor),
+                      label: Text('回到今天', style: TextStyle(color: accentColor, fontSize: 11, fontWeight: FontWeight.bold)),
                     ),
                   IconButton(
                     icon: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
@@ -450,16 +473,16 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6),
           color: AppColors.darkSurface,
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text('日', style: TextStyle(color: AppColors.moodVeryHappy, fontSize: 12, fontWeight: FontWeight.bold)),
-              Text('一', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-              Text('二', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-              Text('三', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-              Text('四', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-              Text('五', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-              Text('六', style: TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.bold)),
+              const Text('日', style: TextStyle(color: AppColors.moodVeryHappy, fontSize: 12, fontWeight: FontWeight.bold)),
+              const Text('一', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              const Text('二', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              const Text('三', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              const Text('四', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              const Text('五', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              Text('六', style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -533,9 +556,9 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isSelected
-                          ? AppColors.primary
+                          ? accentColor
                           : isToday
-                              ? AppColors.primaryLight
+                              ? accentColor.withOpacity(0.7)
                               : Colors.transparent,
                       width: isSelected ? 2.0 : (isToday ? 1.5 : 0),
                     ),
@@ -551,7 +574,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected ? Colors.white : (isToday ? AppColors.primaryLight : AppColors.textPrimary),
+                                color: isSelected ? Colors.white : (isToday ? accentColor : AppColors.textPrimary),
                               ),
                             ),
                             if (dayDiaries.isNotEmpty)
@@ -606,10 +629,10 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                     TextButton.icon(
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
                       onPressed: () => _showRecordDiaryDialog(context, defaultDate: _calendarSelectedDate),
-                      icon: const Icon(Icons.add_circle_outline, size: 16, color: AppColors.primaryLight),
+                      icon: Icon(Icons.add_circle_outline, size: 16, color: accentColor),
                       label: Text(
                         "补记 ${_calendarSelectedDate.month}/${_calendarSelectedDate.day}",
-                        style: const TextStyle(color: AppColors.primaryLight, fontSize: 12, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -650,6 +673,8 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
   }
 
   Widget _buildStatsTab() {
+    final l10n = AppLocalizations.of(context);
+    final accentColor = MoodLightApp.of(context)?.accentColor ?? AppColors.primary;
     final avgScore = MoodCalculator.calculateOverallAverage(_diaries);
     final trendPoints = MoodCalculator.getMoodTrendForDays(_diaries, 7);
 
@@ -670,7 +695,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('近 7 天平均心情指数', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                  Text(l10n?.averageMood ?? '近 7 天平均心情指数', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
                   const SizedBox(height: 6),
                   Text(
                     avgScore > 0 ? "+${avgScore.toStringAsFixed(1)}" : avgScore.toStringAsFixed(1),
@@ -715,7 +740,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                           return FlSpot(e.key.toDouble(), e.value.avgScore);
                         }).toList(),
                         isCurved: true,
-                        color: AppColors.primary,
+                        color: accentColor,
                         barWidth: 3,
                         dotData: const FlDotData(show: true),
                       ),
@@ -731,28 +756,218 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
   }
 
   Widget _buildSettingsTab() {
+    final appState = MoodLightApp.of(context);
+    final l10n = AppLocalizations.of(context);
+    final currentAccent = appState?.accentColor ?? AppColors.primary;
+    final currentLang = appState?.language ?? 'system';
+    final currentThemeMode = appState?.themeMode ?? ThemeMode.dark;
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        // 1. Appearance Section
+        _buildSectionHeader(l10n?.sectionAppearance ?? '个性化与外观', Icons.palette_outlined),
         Card(
-          child: ListTile(
-            leading: const Icon(Icons.shield_outlined, color: AppColors.primary),
-            title: const Text('数据隐私声明'),
-            subtitle: const Text('所有日记均保存在本机 SQLite 数据库，无服务器通信。'),
+          margin: const EdgeInsets.only(bottom: 16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Accent Color Palette Selector
+                Text(l10n?.accentColor ?? '应用主题色', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: AppColors.presetAccentColors.map((color) {
+                    final isSelected = currentAccent.value == color.value;
+                    return InkWell(
+                      onTap: () {
+                        appState?.updateAccentColor(color);
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? Colors.white : Colors.transparent,
+                            width: 2.5,
+                          ),
+                          boxShadow: [
+                            if (isSelected)
+                              BoxShadow(color: color.withOpacity(0.6), blurRadius: 8, spreadRadius: 1),
+                          ],
+                        ),
+                        child: isSelected ? const Icon(Icons.check, size: 20, color: Colors.white) : null,
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const Divider(height: 24),
+
+                // Theme Mode Selector
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(l10n?.themeMode ?? '主题模式', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    DropdownButton<ThemeMode>(
+                      value: currentThemeMode,
+                      underline: const SizedBox(),
+                      dropdownColor: AppColors.darkElevated,
+                      items: [
+                        DropdownMenuItem(value: ThemeMode.dark, child: Text(l10n?.themeModeDark ?? '暗黑')),
+                        DropdownMenuItem(value: ThemeMode.light, child: Text(l10n?.themeModeLight ?? '浅色')),
+                        DropdownMenuItem(value: ThemeMode.system, child: Text(l10n?.themeModeSystem ?? '跟随系统')),
+                      ],
+                      onChanged: (mode) {
+                        if (mode != null) appState?.updateThemeMode(mode);
+                      },
+                    ),
+                  ],
+                ),
+                const Divider(height: 24),
+
+                // Language Selector
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(l10n?.language ?? '应用语言', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    DropdownButton<String>(
+                      value: currentLang,
+                      underline: const SizedBox(),
+                      dropdownColor: AppColors.darkElevated,
+                      items: [
+                        DropdownMenuItem(value: 'system', child: Text(l10n?.langSystem ?? '跟随系统')),
+                        DropdownMenuItem(value: 'zh', child: Text(l10n?.langZh ?? '简体中文')),
+                        DropdownMenuItem(value: 'en', child: Text(l10n?.langEn ?? 'English')),
+                      ],
+                      onChanged: (lang) {
+                        if (lang != null) appState?.updateLanguage(lang);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 12),
+
+        // 2. Preferences Section
+        _buildSectionHeader(l10n?.sectionPreferences ?? '偏好设置', Icons.tune_outlined),
+        Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ListTile(
+            leading: Icon(Icons.auto_awesome_mosaic_outlined, color: currentAccent),
+            title: Text(l10n?.defaultHomeView ?? '默认主页视图'),
+            subtitle: Text(_isCalendarView ? (l10n?.viewCalendar ?? '日历视图') : (l10n?.viewTimeline ?? '列表视图')),
+            trailing: Switch(
+              value: _isCalendarView,
+              activeColor: currentAccent,
+              onChanged: (val) async {
+                setState(() => _isCalendarView = val);
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('user_default_view_calendar', val);
+              },
+            ),
+          ),
+        ),
+
+        // 3. Data Management Section
+        _buildSectionHeader(l10n?.sectionData ?? '数据管理', Icons.security_outlined),
         Card(
           child: ListTile(
-            leading: const Icon(Icons.delete_forever, color: AppColors.moodVeryHappy),
-            title: const Text('清空所有日记数据', style: TextStyle(color: AppColors.moodVeryHappy)),
-            onTap: () async {
-              await _repository.clearAllDiaries();
-              _loadDiaries();
+            leading: Icon(Icons.file_download_outlined, color: currentAccent),
+            title: Text(l10n?.exportData ?? '导出日记数据 (JSON)'),
+            subtitle: const Text('一键备份本地所有心情日记，方便导入或迁移。'),
+            onTap: () {
+              _showExportDataDialog(context);
             },
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: AppColors.textSecondary),
+          const SizedBox(width: 6),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showExportDataDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final jsonList = _diaries.map((d) => d.toMap()).toList();
+    final jsonString = const JsonEncoder.withIndent('  ').convert(jsonList);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: AppColors.darkElevated,
+          title: Row(
+            children: [
+              const Icon(Icons.file_download, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n?.exportTitle ?? '导出 JSON 日记数据备份',
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          content: Container(
+            width: double.maxFinite,
+            height: 260,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.darkBackground,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.divider),
+            ),
+            child: SingleChildScrollView(
+              child: SelectableText(
+                jsonString,
+                style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: AppColors.textSecondary),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('关闭', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              icon: const Icon(Icons.copy, size: 16, color: Colors.white),
+              label: Text(l10n?.copyToClipboard ?? '复制到剪贴板', style: const TextStyle(color: Colors.white)),
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: jsonString));
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n?.copiedSuccess ?? '已成功复制到剪贴板！'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -799,6 +1014,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     final contentController = TextEditingController();
     final targetDate = defaultDate ?? DateTime.now();
     final List<String> selectedTags = [];
+    final accentColor = MoodLightApp.of(context)?.accentColor ?? AppColors.primary;
 
     showModalBottomSheet(
       context: context,
@@ -873,7 +1089,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                           return FilterChip(
                             label: Text(tag),
                             selected: isSelected,
-                            selectedColor: AppColors.primary,
+                            selectedColor: accentColor,
                             checkmarkColor: Colors.white,
                             labelStyle: TextStyle(
                               fontSize: 12,
@@ -893,12 +1109,12 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                           );
                         }).toList(),
                         ActionChip(
-                          avatar: const Icon(Icons.add, size: 14, color: AppColors.primaryLight),
-                          label: const Text('+ 自定义', style: TextStyle(fontSize: 12, color: AppColors.primaryLight)),
+                          avatar: Icon(Icons.add, size: 14, color: accentColor),
+                          label: Text('+ 自定义', style: TextStyle(fontSize: 12, color: accentColor)),
                           backgroundColor: AppColors.darkSurface,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: const BorderSide(color: AppColors.primaryLight, width: 0.8),
+                            side: BorderSide(color: accentColor, width: 0.8),
                           ),
                           onPressed: () {
                             _showAddCustomTagDialog(context, (newTag) async {
@@ -927,7 +1143,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: accentColor,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         onPressed: () async {

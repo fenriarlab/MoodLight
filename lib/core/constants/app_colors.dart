@@ -5,6 +5,15 @@ class AppColors {
   // Brand Primary & Surfaces (Dark Theme First)
   static const Color primary = Color(0xFF4F7FFF); // Calm Blue
   static const Color primaryLight = Color(0xFF7CA0FF);
+
+  // Curated Preset Accent Colors
+  static const List<Color> presetAccentColors = [
+    Color(0xFF4F7FFF), // 静谧蓝
+    Color(0xFFFFB84D), // 温暖橙
+    Color(0xFF2ECC71), // 极光绿
+    Color(0xFF9B59B6), // 梦幻紫
+    Color(0xFFFF6B6B), // 玫瑰粉
+  ];
   
   static const Color darkBackground = Color(0xFF111214); // Primary Background
   static const Color darkSurface = Color(0xFF191C22);    // Cards & Lists
