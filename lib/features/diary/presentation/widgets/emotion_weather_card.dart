@@ -207,8 +207,6 @@ class EmotionWeatherCard extends StatelessWidget {
               'assets/images/cat_header.png',
               height: 72,
               fit: BoxFit.contain,
-              colorBlendMode: tc.isDark ? BlendMode.dstIn : BlendMode.multiply,
-              color: tc.isDark ? null : Colors.white.withOpacity(0.95),
               errorBuilder: (ctx, err, stack) {
                 return const Text('🐱', style: TextStyle(fontSize: 40));
               },
