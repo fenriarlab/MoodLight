@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/theme_colors.dart';
 
 class TagFilterBar extends StatelessWidget {
@@ -18,6 +19,7 @@ class TagFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
+    final l10n = AppLocalizations.of(context);
     final allAvailableTags = [...defaultPresetTags, ...userCustomTags];
 
     return Container(
@@ -31,7 +33,7 @@ class TagFilterBar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 6),
             child: FilterChip(
-              label: const Text('全部'),
+              label: Text(l10n?.filterAll ?? '全部'),
               selected: selectedFilterTag == null,
               onSelected: (bool selected) {
                 onTagSelected(null);

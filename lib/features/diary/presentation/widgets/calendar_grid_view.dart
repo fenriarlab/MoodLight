@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
@@ -29,6 +30,7 @@ class CalendarGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
+    final l10n = AppLocalizations.of(context);
     final year = selectedMonth.year;
     final month = selectedMonth.month;
     final daysInMonth = DateUtils.getDaysInMonth(year, month);
@@ -44,6 +46,10 @@ class CalendarGridView extends StatelessWidget {
 
     final selectedDateKey = MoodCalculator.formatDateKey(selectedDate);
     final selectedDayDiaries = groupedMap[selectedDateKey] ?? [];
+
+    final formattedAvg = monthAvgScore > 0 ? "+${monthAvgScore.toStringAsFixed(1)}" : monthAvgScore.toStringAsFixed(1);
+    final monthYearFormat = Localizations.localeOf(context).languageCode == 'en' ? 'MMMM yyyy' : 'yyyy 年 MM 月';
+    final dayDateFormat = Localizations.localeOf(context).languageCode == 'en' ? 'MMM dd' : 'MM月dd日';
 
     return Column(
       children: [
@@ -80,7 +86,7 @@ class CalendarGridView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        DateFormat('yyyy 年 MM 月').format(selectedMonth),
+                        DateFormat(monthYearFormat).format(selectedMonth),
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: tc.textPrimary),
                       ),
                       Icon(Icons.arrow_drop_down, color: tc.accent),
@@ -99,7 +105,7 @@ class CalendarGridView extends StatelessWidget {
                         onDateSelected(now);
                       },
                       icon: Icon(Icons.today, size: 14, color: tc.accent),
-                      label: Text('回到今天', style: TextStyle(color: tc.accent, fontSize: 11, fontWeight: FontWeight.bold)),
+                      label: Text(l10n?.backToToday ?? '回到今天', style: TextStyle(color: tc.accent, fontSize: 11, fontWeight: FontWeight.bold)),
                     ),
                   IconButton(
                     icon: Icon(Icons.chevron_right, color: tc.textSecondary),
@@ -120,9 +126,12 @@ class CalendarGridView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text('本月篇数: ${monthDiaries.length} 篇', style: TextStyle(fontSize: 12, color: tc.textPrimary)),
               Text(
-                '月平均心情: ${monthAvgScore > 0 ? "+${monthAvgScore.toStringAsFixed(1)}" : monthAvgScore.toStringAsFixed(1)} ${AppColors.getMoodEmoji(monthAvgScore.round())}',
+                l10n?.monthEntriesCount(monthDiaries.length) ?? '本月篇数: ${monthDiaries.length} 篇',
+                style: TextStyle(fontSize: 12, color: tc.textPrimary),
+              ),
+              Text(
+                "${l10n?.monthAverageMood(formattedAvg) ?? '月平均心情: $formattedAvg'} ${AppColors.getMoodEmoji(monthAvgScore.round())}",
                 style: TextStyle(fontSize: 12, color: AppColors.getMoodColor(monthAvgScore.round()), fontWeight: FontWeight.bold),
               ),
             ],
@@ -136,13 +145,13 @@ class CalendarGridView extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const Text('日', style: TextStyle(color: AppColors.moodVeryHappy, fontSize: 12, fontWeight: FontWeight.bold)),
-              Text('一', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
-              Text('二', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
-              Text('三', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
-              Text('四', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
-              Text('五', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
-              Text('六', style: TextStyle(color: tc.accent, fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(l10n?.weekdaySun ?? '日', style: const TextStyle(color: AppColors.moodVeryHappy, fontSize: 12, fontWeight: FontWeight.bold)),
+              Text(l10n?.weekdayMon ?? '一', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
+              Text(l10n?.weekdayTue ?? '二', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
+              Text(l10n?.weekdayWed ?? '三', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
+              Text(l10n?.weekdayThu ?? '四', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
+              Text(l10n?.weekdayFri ?? '五', style: TextStyle(color: tc.textSecondary, fontSize: 12)),
+              Text(l10n?.weekdaySat ?? '六', style: TextStyle(color: tc.accent, fontSize: 12, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -284,7 +293,8 @@ class CalendarGridView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        "📅 ${DateFormat('MM月dd日').format(selectedDate)} • 共 ${selectedDayDiaries.length} 篇心情",
+                        l10n?.dateDetailsHeader(DateFormat(dayDateFormat).format(selectedDate), selectedDayDiaries.length) ??
+                            "📅 ${DateFormat(dayDateFormat).format(selectedDate)} • 共 ${selectedDayDiaries.length} 篇心情",
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: tc.textPrimary),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -294,7 +304,7 @@ class CalendarGridView extends StatelessWidget {
                       onPressed: () => onRetroactiveRecord(selectedDate),
                       icon: Icon(Icons.add_circle_outline, size: 16, color: tc.accent),
                       label: Text(
-                        "补记 ${selectedDate.month}/${selectedDate.day}",
+                        l10n?.retroactiveButton("${selectedDate.month}/${selectedDate.day}") ?? "补记 ${selectedDate.month}/${selectedDate.day}",
                         style: TextStyle(color: tc.accent, fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -308,12 +318,12 @@ class CalendarGridView extends StatelessWidget {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('🌱 该天尚无心情记录', style: TextStyle(color: tc.textSecondary, fontSize: 13)),
+                                Text(l10n?.noEntriesForDate ?? '🌱 该天尚无心情记录', style: TextStyle(color: tc.textSecondary, fontSize: 13)),
                                 const SizedBox(height: 8),
                                 OutlinedButton.icon(
                                   onPressed: () => onRetroactiveRecord(selectedDate),
                                   icon: const Icon(Icons.edit_calendar, size: 14),
-                                  label: const Text('补记心情', style: TextStyle(fontSize: 12)),
+                                  label: Text(l10n?.retroactiveLog ?? '补记心情', style: const TextStyle(fontSize: 12)),
                                 ),
                               ],
                             ),

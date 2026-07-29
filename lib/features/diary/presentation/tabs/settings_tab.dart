@@ -163,7 +163,7 @@ class SettingsTab extends StatelessWidget {
           child: ListTile(
             leading: Icon(Icons.file_download_outlined, color: tc.accent),
             title: Text(l10n?.exportData ?? '导出日记数据 (JSON)', style: TextStyle(color: tc.textPrimary)),
-            subtitle: Text('一键备份本地所有心情日记，方便导入或迁移。', style: TextStyle(color: tc.textSecondary)),
+            subtitle: Text(l10n?.exportDataSubtitle ?? '一键备份本地所有心情日记，方便导入或迁移。', style: TextStyle(color: tc.textSecondary)),
             onTap: () {
               showExportDataDialog(context, diaries);
             },

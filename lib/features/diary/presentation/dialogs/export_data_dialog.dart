@@ -47,7 +47,7 @@ void showExportDataDialog(BuildContext context, List<MoodDiaryModel> diaries) {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('关闭', style: TextStyle(color: tc.textSecondary)),
+            child: Text(l10n?.close ?? '关闭', style: TextStyle(color: tc.textSecondary)),
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(backgroundColor: tc.accent),

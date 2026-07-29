@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../data/models/mood_diary_model.dart';
@@ -18,6 +19,7 @@ void showRecordDiarySheet(
   final targetDate = defaultDate ?? DateTime.now();
   final List<String> selectedTags = [];
   final tc = ThemeColors.of(context);
+  final l10n = AppLocalizations.of(context);
   final repository = DiaryRepository();
 
   showModalBottomSheet(
@@ -41,9 +43,12 @@ void showRecordDiarySheet(
                   defaultDate.month != DateTime.now().month ||
                   defaultDate.day != DateTime.now().day);
 
+          final dateStr = "${defaultDate?.month}/${defaultDate?.day}";
           final titleText = isRetroactive
-              ? '补记 ${defaultDate.year}年${defaultDate.month}月${defaultDate.day}日 心情'
-              : '今天心情怎么样？';
+              ? (l10n?.retroactiveMoodTitle(dateStr) ?? '补记 $dateStr 心情')
+              : (l10n?.todayMoodTitle ?? '今天心情怎么样？');
+
+          final scoreVal = currentScoreInt > 0 ? '+$currentScoreInt' : '$currentScoreInt';
 
           return Padding(
             padding: EdgeInsets.only(
@@ -65,7 +70,7 @@ void showRecordDiarySheet(
                         Text(emoji, style: const TextStyle(fontSize: 48)),
                         const SizedBox(height: 4),
                         Text(moodText, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: moodColor)),
-                        Text("分数: ${currentScoreInt > 0 ? '+$currentScoreInt' : '$currentScoreInt'}", style: TextStyle(fontSize: 12, color: tc.textSecondary)),
+                        Text(l10n?.scoreText(scoreVal) ?? "分数: $scoreVal", style: TextStyle(fontSize: 12, color: tc.textSecondary)),
                       ],
                     ),
                   ),
@@ -82,7 +87,7 @@ void showRecordDiarySheet(
                     },
                   ),
                   const SizedBox(height: 8),
-                  Text('关联标签 (可多选):', style: TextStyle(fontSize: 13, color: tc.textSecondary, fontWeight: FontWeight.w500)),
+                  Text(l10n?.associateTags ?? '关联标签 (可多选):', style: TextStyle(fontSize: 13, color: tc.textSecondary, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 6,
@@ -114,7 +119,7 @@ void showRecordDiarySheet(
                       }).toList(),
                       ActionChip(
                         avatar: Icon(Icons.add, size: 14, color: tc.accent),
-                        label: Text('+ 自定义', style: TextStyle(fontSize: 12, color: tc.accent)),
+                        label: Text(l10n?.customTag ?? '+ 自定义', style: TextStyle(fontSize: 12, color: tc.accent)),
                         backgroundColor: tc.elevated,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -139,7 +144,7 @@ void showRecordDiarySheet(
                     maxLines: 3,
                     style: TextStyle(color: tc.textPrimary),
                     decoration: InputDecoration(
-                      hintText: '写下此刻的心情与故事...',
+                      hintText: l10n?.contentPlaceholder ?? '写下此刻的心情与故事...',
                       hintStyle: TextStyle(color: tc.textSecondary),
                       border: const OutlineInputBorder(),
                     ),
@@ -177,7 +182,9 @@ void showRecordDiarySheet(
                         onSaved();
                       },
                       child: Text(
-                        isRetroactive ? '保存 ${defaultDate.month}月${defaultDate.day}日 心情' : '保存心情日记',
+                        isRetroactive
+                            ? (l10n?.saveRetroactiveMood(dateStr) ?? '保存 $dateStr 心情')
+                            : (l10n?.saveDiary ?? '保存心情日记'),
                         style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),

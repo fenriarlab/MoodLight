@@ -68,7 +68,7 @@ class StatsTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('近 7 天心情波动趋势', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: tc.textPrimary)),
+              Text(l10n?.trendChartTitle ?? '近 7 天心情波动趋势', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: tc.textPrimary)),
               const SizedBox(height: 20),
               Expanded(
                 child: LineChart(
