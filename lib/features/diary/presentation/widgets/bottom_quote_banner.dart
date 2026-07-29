@@ -19,7 +19,7 @@ class BottomQuoteBanner extends StatelessWidget {
     final buttonText = isToday ? '+ 记录今天' : '+ 补记心情';
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         gradient: tc.isDark
@@ -89,15 +89,33 @@ class BottomQuoteBanner extends StatelessWidget {
             ),
           ),
 
-          // Large Gradient CTA Button with Ambient Shadow
+          // Large 3D Glass Specular Highlight CTA Button
           GestureDetector(
             onTap: onRecordTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
               decoration: BoxDecoration(
-                gradient: ThemeColors.purpleGradient,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: ThemeColors.purpleGlowShadow(),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFA855F7), Color(0xFF7E22CE)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border(
+                  top: BorderSide(
+                    color: Colors.white.withOpacity(0.45),
+                    width: 1.2,
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF8E4BF6).withOpacity(0.48),
+                    blurRadius: 16,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
               child: Text(
                 buttonText,
@@ -105,6 +123,7 @@ class BottomQuoteBanner extends StatelessWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),

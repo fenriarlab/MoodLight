@@ -219,9 +219,9 @@ class CalendarGridView extends StatelessWidget {
               itemCount: firstWeekday + daysInMonth,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 7,
-                childAspectRatio: 0.95,
-                mainAxisSpacing: 6,
-                crossAxisSpacing: 6,
+                childAspectRatio: 1.22,
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
               ),
               itemBuilder: (ctx, index) {
                 if (index < firstWeekday) {

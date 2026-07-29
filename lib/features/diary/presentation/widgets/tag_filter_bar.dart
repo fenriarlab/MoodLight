@@ -23,7 +23,7 @@ class TagFilterBar extends StatelessWidget {
     final allAvailableTags = [...defaultPresetTags, ...userCustomTags];
 
     return Container(
-      height: 50,
+      height: 48,
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: ListView(
         scrollDirection: Axis.horizontal,
@@ -70,22 +70,27 @@ class TagFilterBar extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           gradient: isSelected
               ? ThemeColors.purpleGradient
               : null,
           color: isSelected
               ? null
-              : (tc.isDark ? const Color(0xFF2A2E37) : const Color(0xFFFAF7FF)),
+              : (tc.isDark ? const Color(0xFF2A2E37) : Colors.white),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected
-                ? Colors.transparent
-                : (tc.isDark ? const Color(0xFF3F3B54) : const Color(0xFFEADBFF)),
-            width: 1,
-          ),
-          boxShadow: isSelected ? ThemeColors.purpleGlowShadow() : null,
+          boxShadow: isSelected
+              ? ThemeColors.purpleGlowShadow()
+              : [
+                  BoxShadow(
+                    color: tc.isDark
+                        ? Colors.black.withOpacity(0.2)
+                        : const Color(0xFF9D75F0).withOpacity(0.12),
+                    blurRadius: 8,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -94,7 +99,7 @@ class TagFilterBar extends StatelessWidget {
               Icon(
                 icon,
                 size: 14,
-                color: isSelected ? Colors.white : tc.accent,
+                color: isSelected ? Colors.white : const Color(0xFF8C52EE),
               ),
               const SizedBox(width: 4),
             ],
