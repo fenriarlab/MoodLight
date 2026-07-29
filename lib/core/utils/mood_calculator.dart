@@ -48,4 +48,17 @@ class MoodCalculator {
     final total = diaries.fold(0, (sum, item) => sum + item.score);
     return (total / diaries.length);
   }
+
+  static String formatDateKey(DateTime dt) {
+    return "${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}";
+  }
+
+  static Map<String, List<MoodDiaryModel>> groupDiariesByDate(List<MoodDiaryModel> diaries) {
+    final Map<String, List<MoodDiaryModel>> result = {};
+    for (var diary in diaries) {
+      final key = formatDateKey(diary.createdAt);
+      result.putIfAbsent(key, () => []).add(diary);
+    }
+    return result;
+  }
 }
