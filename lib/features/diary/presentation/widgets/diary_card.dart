@@ -114,19 +114,20 @@ class DiaryCard extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 3),
-                  // Content Text Spanning Full Width Smoothly
-                  Text(
-                    item.content.isEmpty ? '（未填写心情感悟）' : item.content,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: tc.textPrimary,
-                      height: 1.35,
-                      fontWeight: FontWeight.w400,
+                  if (item.content.trim().isNotEmpty) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      item.content,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: tc.textPrimary,
+                        height: 1.35,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  ],
                   if (item.tags.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Wrap(

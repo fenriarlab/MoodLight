@@ -124,7 +124,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
             ),
             const SizedBox(height: 2),
             Text(
-              '记录每一种真实的心情',
+              '我的心情，有光照亮',
               style: TextStyle(
                 fontSize: 11,
                 color: tc.textSecondary,

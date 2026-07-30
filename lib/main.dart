@@ -90,7 +90,7 @@ class _MoodLightAppState extends State<MoodLightApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MoodLight 心情日记',
+      title: 'MoodLight',
       debugShowCheckedModeBanner: false,
       locale: _getLocale(),
       supportedLocales: AppLocalizations.supportedLocales,

@@ -245,7 +245,7 @@ class CalendarGridView extends StatelessWidget {
               itemCount: firstWeekday + daysInMonth,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 7,
-                childAspectRatio: 1.65,
+                childAspectRatio: 1.42,
                 mainAxisSpacing: 5,
                 crossAxisSpacing: 5,
               ),
@@ -273,13 +273,13 @@ class CalendarGridView extends StatelessWidget {
                     onDateSelected(thisDate);
                     onRetroactiveRecord(thisDate);
                   },
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(9),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
                     decoration: BoxDecoration(
                       color: palette == null ? cellColor : null,
                       gradient: palette?.gradient,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(9),
                       // KEEP USER'S PREFERRED AMBIENT PURPLE / MOOD GLOW HALO FOR SELECTED DATE
                       boxShadow: isSelected
                           ? [
