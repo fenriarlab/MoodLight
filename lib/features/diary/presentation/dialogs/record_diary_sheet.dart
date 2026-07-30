@@ -9,15 +9,16 @@ import 'custom_tag_dialog.dart';
 void showRecordDiarySheet(
   BuildContext context, {
   DateTime? defaultDate,
+  MoodDiaryModel? existingDiary,
   required List<String> defaultPresetTags,
   required List<String> userCustomTags,
   required Function(String) onCustomTagAdded,
   required VoidCallback onSaved,
 }) {
-  double selectedScore = 0;
-  final contentController = TextEditingController();
-  final targetDate = defaultDate ?? DateTime.now();
-  final List<String> selectedTags = [];
+  double selectedScore = existingDiary != null ? existingDiary.score.toDouble() : 0;
+  final contentController = TextEditingController(text: existingDiary?.content ?? '');
+  final targetDate = existingDiary != null ? existingDiary.createdAt : (defaultDate ?? DateTime.now());
+  final List<String> selectedTags = existingDiary != null ? List.from(existingDiary.tags) : [];
   final tc = ThemeColors.of(context);
   final l10n = AppLocalizations.of(context);
   final repository = DiaryRepository();
@@ -43,10 +44,12 @@ void showRecordDiarySheet(
                   defaultDate.month != DateTime.now().month ||
                   defaultDate.day != DateTime.now().day);
 
-          final dateStr = "${defaultDate?.month}/${defaultDate?.day}";
-          final titleText = isRetroactive
-              ? (l10n?.retroactiveMoodTitle(dateStr) ?? '补记 $dateStr 心情')
-              : (l10n?.todayMoodTitle ?? '今天心情怎么样？');
+          final dateStr = "${targetDate.month}/${targetDate.day}";
+          final titleText = existingDiary != null
+              ? '编辑 $dateStr 心情日记'
+              : (isRetroactive
+                  ? (l10n?.retroactiveMoodTitle(dateStr) ?? '补记 $dateStr 心情')
+                  : (l10n?.todayMoodTitle ?? '今天心情怎么样？'));
 
           final scoreVal = currentScoreInt > 0 ? '+$currentScoreInt' : '$currentScoreInt';
 
@@ -164,33 +167,45 @@ void showRecordDiarySheet(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () async {
-                        final now = DateTime.now();
-                        final recordTime = DateTime(
-                          targetDate.year,
-                          targetDate.month,
-                          targetDate.day,
-                          now.hour,
-                          now.minute,
-                          now.second,
-                        );
+                        if (existingDiary != null) {
+                          final updatedDiary = existingDiary.copyWith(
+                            score: currentScoreInt,
+                            moodEmoji: emoji,
+                            content: contentController.text.trim(),
+                            tags: selectedTags,
+                          );
+                          await repository.updateDiary(updatedDiary);
+                        } else {
+                          final now = DateTime.now();
+                          final recordTime = DateTime(
+                            targetDate.year,
+                            targetDate.month,
+                            targetDate.day,
+                            now.hour,
+                            now.minute,
+                            now.second,
+                          );
 
-                        final newDiary = MoodDiaryModel(
-                          id: "mood_${recordTime.millisecondsSinceEpoch}",
-                          score: currentScoreInt,
-                          moodEmoji: emoji,
-                          content: contentController.text.trim(),
-                          themeColor: '#4F7FFF',
-                          tags: selectedTags,
-                          createdAt: recordTime,
-                        );
-                        await repository.insertDiary(newDiary);
+                          final newDiary = MoodDiaryModel(
+                            id: "mood_${recordTime.millisecondsSinceEpoch}",
+                            score: currentScoreInt,
+                            moodEmoji: emoji,
+                            content: contentController.text.trim(),
+                            themeColor: '#4F7FFF',
+                            tags: selectedTags,
+                            createdAt: recordTime,
+                          );
+                          await repository.insertDiary(newDiary);
+                        }
                         Navigator.pop(ctx);
                         onSaved();
                       },
                       child: Text(
-                        isRetroactive
-                            ? (l10n?.saveRetroactiveMood(dateStr) ?? '保存 $dateStr 心情')
-                            : (l10n?.saveDiary ?? '保存心情日记'),
+                        existingDiary != null
+                            ? '保存修改'
+                            : (isRetroactive
+                                ? (l10n?.saveRetroactiveMood(dateStr) ?? '保存 $dateStr 心情')
+                                : (l10n?.saveDiary ?? '保存心情日记')),
                         style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),

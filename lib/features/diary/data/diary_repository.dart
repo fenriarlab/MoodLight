@@ -15,6 +15,11 @@ class DiaryRepository {
     return maps.map((m) => MoodDiaryModel.fromMap(m)).toList();
   }
 
+  Future<void> updateDiary(MoodDiaryModel diary) async {
+    final db = await _dbHelper.database;
+    await db.update('mood_diaries', diary.toMap(), where: 'id = ?', whereArgs: [diary.id]);
+  }
+
   Future<void> deleteDiary(String id) async {
     final db = await _dbHelper.database;
     await db.delete('mood_diaries', where: 'id = ?', whereArgs: [id]);
