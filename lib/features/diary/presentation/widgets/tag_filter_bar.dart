@@ -23,10 +23,11 @@ class TagFilterBar extends StatelessWidget {
     final allAvailableTags = [...defaultPresetTags, ...userCustomTags];
 
     return Container(
-      height: 36,
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      height: 44,
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: ListView(
         scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           Padding(
