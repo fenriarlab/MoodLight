@@ -62,10 +62,10 @@ class ThemeColors {
   static List<BoxShadow> cardAmbientShadow(bool isDark) {
     return [
       BoxShadow(
-        color: isDark ? Colors.black.withOpacity(0.35) : const Color(0xFF9D75F0).withOpacity(0.18),
-        blurRadius: 24,
+        color: isDark ? Colors.black.withOpacity(0.25) : const Color(0xFF8C52EE).withOpacity(0.08),
+        blurRadius: 12,
         spreadRadius: 0,
-        offset: const Offset(0, 8),
+        offset: const Offset(0, 4),
       ),
     ];
   }
