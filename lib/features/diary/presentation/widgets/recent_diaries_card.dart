@@ -23,24 +23,18 @@ class RecentDiariesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
+    final DateTime targetDate = selectedDate ?? DateTime.now();
 
     // Filter diaries for the selected date
-    List<MoodDiaryModel> selectedDateDiaries = [];
-    String cardTitle = '最近心情记录';
+    final selectedDateDiaries = diaries.where((d) {
+      return d.createdAt.year == targetDate.year &&
+          d.createdAt.month == targetDate.month &&
+          d.createdAt.day == targetDate.day;
+    }).toList();
 
-    if (selectedDate != null) {
-      selectedDateDiaries = diaries.where((d) {
-        return d.createdAt.year == selectedDate!.year &&
-            d.createdAt.month == selectedDate!.month &&
-            d.createdAt.day == selectedDate!.day;
-      }).toList();
+    final String cardTitle = '${targetDate.month}月${targetDate.day}日的心情';
 
-      if (selectedDateDiaries.isNotEmpty) {
-        cardTitle = '${selectedDate!.month}月${selectedDate!.day}日的心情';
-      }
-    }
-
-    // Outer card ONLY displays 1 entry if available for selected date,
+    // Outer card ONLY displays 1 entry if available for target date,
     // otherwise fallback to 1 entry for recent diaries
     final List<MoodDiaryModel> displayList = selectedDateDiaries.isNotEmpty
         ? selectedDateDiaries.take(1).toList()
@@ -48,8 +42,8 @@ class RecentDiariesCard extends StatelessWidget {
 
     final int dateEntriesCount = selectedDateDiaries.length;
     final String actionText = dateEntriesCount > 1
-        ? '全部记录 (${dateEntriesCount}条)'
-        : '全部记录';
+        ? '当日记录 (${dateEntriesCount}条)'
+        : '当日记录';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -84,7 +78,7 @@ class RecentDiariesCard extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (ctx) => AllDiariesScreen(
                         diaries: diaries,
-                        initialDate: selectedDateDiaries.isNotEmpty ? selectedDate : null,
+                        initialDate: targetDate,
                         onDeleteDiary: onDeleteDiary,
                         onEditDiary: onEditDiary,
                         onReload: onReload,
@@ -129,7 +123,7 @@ class RecentDiariesCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Center(
                 child: Text(
-                  '🌱 还没有记录心情，写第一篇吧！',
+                  '🌱 ${targetDate.month}月${targetDate.day}日还没有记录心情，写第一篇吧！',
                   style: TextStyle(color: tc.textSecondary, fontSize: 13),
                 ),
               ),

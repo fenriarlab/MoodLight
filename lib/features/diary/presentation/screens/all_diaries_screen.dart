@@ -26,12 +26,14 @@ class AllDiariesScreen extends StatefulWidget {
 class _AllDiariesScreenState extends State<AllDiariesScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  DateTime? _selectedDateFilter;
+  late DateTime? _selectedDateFilter;
+  bool _showAllHistory = false;
 
   @override
   void initState() {
     super.initState();
-    _selectedDateFilter = widget.initialDate;
+    _selectedDateFilter = widget.initialDate ?? DateTime.now();
+    _showAllHistory = widget.initialDate == null;
   }
 
   bool _isSameDay(DateTime a, DateTime b) {
@@ -42,9 +44,9 @@ class _AllDiariesScreenState extends State<AllDiariesScreen> {
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
 
-    // Filter by date first if selected
+    // Filter by date first if not viewing all history
     final dateFilteredDiaries = widget.diaries.where((d) {
-      if (_selectedDateFilter == null) return true;
+      if (_showAllHistory || _selectedDateFilter == null) return true;
       return _isSameDay(d.createdAt, _selectedDateFilter!);
     }).toList();
 
@@ -57,9 +59,13 @@ class _AllDiariesScreenState extends State<AllDiariesScreen> {
       return matchContent || matchTag;
     }).toList();
 
-    final titleText = _selectedDateFilter != null
-        ? '${_selectedDateFilter!.month}月${_selectedDateFilter!.day}日的心情记录 (${dateFilteredDiaries.length}条)'
-        : '全部心情记录 (${widget.diaries.length}条)';
+    final dateStr = _selectedDateFilter != null
+        ? '${_selectedDateFilter!.month}月${_selectedDateFilter!.day}日'
+        : '当日';
+
+    final titleText = _showAllHistory
+        ? '全部历史记录 (${widget.diaries.length}条)'
+        : '$dateStr的心情记录 (${dateFilteredDiaries.length}条)';
 
     return Scaffold(
       backgroundColor: tc.isDark ? const Color(0xFF14121A) : const Color(0xFFF9F4FE),
@@ -77,63 +83,78 @@ class _AllDiariesScreenState extends State<AllDiariesScreen> {
       ),
       body: Column(
         children: [
-          // Date Filter Chip Bar (If date filter active)
-          if (_selectedDateFilter != null)
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          // Mode Toggle Pill Bar ( [ 📅 当日记录 ] | [ 📜 全部历史 ] )
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: Container(
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: const Color(0xFF8C52EE).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
+                color: tc.surface,
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF8C52EE).withOpacity(0.24),
+                  color: tc.isDark ? const Color(0xFF39334D) : const Color(0xFFEFE8FB),
                 ),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today, size: 14, color: Color(0xFF8C52EE)),
-                      const SizedBox(width: 6),
-                      Text(
-                        '正在查看 ${_selectedDateFilter!.month}月${_selectedDateFilter!.day}日 (${dateFilteredDiaries.length}条记录)',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF8C52EE),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _showAllHistory = false),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: !_showAllHistory
+                              ? const Color(0xFF8C52EE)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                      ),
-                    ],
-                  ),
-                  InkWell(
-                    onTap: () => setState(() => _selectedDateFilter = null),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      child: Row(
-                        children: const [
-                          Text(
-                            '查看全量历史',
+                        child: Center(
+                          child: Text(
+                            '📅 $dateStr记录 (${dateFilteredDiaries.length})',
                             style: TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF8C52EE),
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
+                              color: !_showAllHistory ? Colors.white : tc.textSecondary,
                             ),
                           ),
-                          SizedBox(width: 2),
-                          Icon(Icons.clear, size: 13, color: Color(0xFF8C52EE)),
-                        ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _showAllHistory = true),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _showAllHistory
+                              ? const Color(0xFF8C52EE)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '📜 全部历史 (${widget.diaries.length})',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _showAllHistory ? Colors.white : tc.textSecondary,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
+          ),
 
           // Search Filter Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             child: TextField(
               controller: _searchController,
               onChanged: (val) => setState(() => _searchQuery = val.trim()),
@@ -176,7 +197,7 @@ class _AllDiariesScreenState extends State<AllDiariesScreen> {
                 ? Center(
                     child: Text(
                       _searchQuery.isEmpty
-                          ? (_selectedDateFilter != null ? '🌱 当天没有记录心情' : '🌱 暂无心情记录')
+                          ? (!_showAllHistory ? '🌱 $dateStr没有记录心情' : '🌱 暂无心情记录')
                           : '没有找到匹配的心情日记',
                       style: TextStyle(color: tc.textSecondary, fontSize: 14),
                     ),
