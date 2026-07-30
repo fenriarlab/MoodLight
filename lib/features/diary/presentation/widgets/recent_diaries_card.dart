@@ -35,12 +35,13 @@ class RecentDiariesCard extends StatelessWidget {
     }).toList();
 
     final bool hasEntries = selectedDateDiaries.isNotEmpty;
-    final String cardTitle = '${targetDate.month}月${targetDate.day}日的心情';
+    // Show only the date in top left title to prevent "心情" word clutter
+    final String cardTitle = '${targetDate.month}月${targetDate.day}日';
 
     final int dateEntriesCount = selectedDateDiaries.length;
     final String actionText = hasEntries
         ? (dateEntriesCount > 1 ? '当日记录 (${dateEntriesCount}条)' : '当日记录')
-        : '补记心情';
+        : '补记';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -63,7 +64,7 @@ class RecentDiariesCard extends StatelessWidget {
               Text(
                 cardTitle,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: tc.textPrimary,
                 ),
@@ -122,61 +123,33 @@ class RecentDiariesCard extends StatelessWidget {
           const SizedBox(height: 12),
 
           if (!hasEntries)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-              decoration: BoxDecoration(
-                color: tc.isDark ? const Color(0xFF221F2E) : const Color(0xFFF9F5FE),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: tc.isDark ? const Color(0xFF332D45) : const Color(0xFFF0E8FC),
+            InkWell(
+              onTap: () {
+                if (onRetroactiveRecord != null) {
+                  onRetroactiveRecord!(targetDate);
+                }
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: tc.isDark ? const Color(0xFF221F2E) : const Color(0xFFF9F5FE),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: tc.isDark ? const Color(0xFF332D45) : const Color(0xFFF0E8FC),
+                  ),
                 ),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '🌱 ${targetDate.month}月${targetDate.day}日还没有记录心情',
+                child: Center(
+                  child: Text(
+                    '🌱 ${targetDate.month}月${targetDate.day}日还没有记录',
                     style: TextStyle(
                       color: tc.textSecondary,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  InkWell(
-                    onTap: () {
-                      if (onRetroactiveRecord != null) {
-                        onRetroactiveRecord!(targetDate);
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8C52EE).withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: const Color(0xFF8C52EE).withOpacity(0.3),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.edit_calendar, size: 14, color: Color(0xFF8C52EE)),
-                          const SizedBox(width: 6),
-                          Text(
-                            '补记 ${targetDate.month}月${targetDate.day}日 心情',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF8C52EE),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             )
           else
