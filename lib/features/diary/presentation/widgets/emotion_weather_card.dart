@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
 import '../../data/models/mood_diary_model.dart';
@@ -22,194 +21,91 @@ class EmotionWeatherCard extends StatelessWidget {
         .toList();
 
     final avgScore = MoodCalculator.calculateOverallAverage(monthDiaries);
-    final weatherTitle = MoodCalculator.getEmotionWeatherTitle(avgScore);
-    final weatherSubtitle = MoodCalculator.getEmotionWeatherSubtitle(avgScore);
-    final mostTag = MoodCalculator.getMostFrequentTag(diaries);
 
-    final avgFormatted = avgScore > 0 ? "+${avgScore.toStringAsFixed(1)}" : avgScore.toStringAsFixed(1);
-    final progressValue = ((avgScore + 5) / 10).clamp(0.0, 1.0);
+    // Extract weather emoji and text
+    String weatherEmoji = '⛅';
+    String weatherText = '多云转晴';
+    if (avgScore >= 3.0) {
+      weatherEmoji = '☀️';
+      weatherText = '晴空万里';
+    } else if (avgScore >= 1.5) {
+      weatherEmoji = '⛅';
+      weatherText = '多云转晴';
+    } else if (avgScore >= 0.0) {
+      weatherEmoji = '🌤️';
+      weatherText = '微风拂面';
+    } else if (avgScore >= -2.0) {
+      weatherEmoji = '🌧️';
+      weatherText = '偶尔阵雨';
+    } else {
+      weatherEmoji = '🌩️';
+      weatherText = '阴雨连绵';
+    }
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Background Card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: tc.isDark
-                  ? LinearGradient(
-                      colors: [const Color(0xFF26203B), const Color(0xFF1F1B2E)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : LinearGradient(
-                      colors: [const Color(0xFFF3ECFE), const Color(0xFFECE2FF)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFE5D8FF),
-                width: 1,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: tc.isDark
+            ? LinearGradient(
+                colors: [const Color(0xFF282239), const Color(0xFF1E1A2C)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              )
+            : LinearGradient(
+                colors: [const Color(0xFFFFFFFF), const Color(0xFFFFF8F0)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-              boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Left Column: Weather Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${selectedMonth.month}月情绪天气',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF7A6B9C),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              weatherTitle,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: tc.isDark ? Colors.white : const Color(0xFF332057),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            size: 18,
-                            color: tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF7A6B9C),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        weatherSubtitle,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: tc.isDark ? const Color(0xFF9E95BD) : const Color(0xFF8C7DAE),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(width: 80), // Space for Cat Mascot in middle
-
-                // Right Column: Stats
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '月平均心情',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF7A6B9C),
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Row(
-                              children: [
-                                Text(AppColors.getMoodEmoji(avgScore.round()), style: const TextStyle(fontSize: 16)),
-                                const SizedBox(width: 4),
-                                Text(
-                                  avgFormatted,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: tc.isDark ? Colors.white : const Color(0xFF332057),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '最常出现',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF7A6B9C),
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF2ECC71).withOpacity(0.18),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                mostTag,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF27AE60),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Rounded Progress Bar
-                    Container(
-                      width: 110,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFE2D4FF),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: progressValue,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF9B59B6), Color(0xFF4F7FFF)],
-                            ),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFF3E7DB),
+          width: 1,
+        ),
+        boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // 1. Top Title (e.g. "7月情绪天气")
+          Text(
+            '${selectedMonth.month}月情绪天气',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF7A6B9C),
             ),
           ),
+          const SizedBox(height: 12),
 
-          // Overlapping Cat Mascot Leaning Top
-          Positioned(
-            top: -26,
-            left: 115,
-            child: Image.asset(
-              'assets/images/cat_header.png',
-              height: 72,
-              fit: BoxFit.contain,
-              errorBuilder: (ctx, err, stack) {
-                return const Text('🐱', style: TextStyle(fontSize: 40));
-              },
+          // 2. Center Hero Weather Graphic
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: tc.isDark
+                  ? const Color(0xFF382F4E).withOpacity(0.5)
+                  : const Color(0xFFFFF3E0).withOpacity(0.6),
+            ),
+            child: Center(
+              child: Text(
+                weatherEmoji,
+                style: const TextStyle(fontSize: 44),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // 3. Bottom Main Weather Conclusion (e.g. "多云转晴")
+          Text(
+            weatherText,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: tc.isDark ? Colors.white : const Color(0xFF2D1F47),
+              letterSpacing: 0.5,
             ),
           ),
         ],
