@@ -98,6 +98,7 @@ class DiariesTab extends StatelessWidget {
               selectedDate: calendarSelectedDate,
               onDeleteDiary: onDeleteDiary,
               onEditDiary: onEditDiary,
+              onRetroactiveRecord: onRetroactiveRecord,
               onReload: onReload,
             ),
 

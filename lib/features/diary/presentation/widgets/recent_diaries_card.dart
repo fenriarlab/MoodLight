@@ -9,6 +9,7 @@ class RecentDiariesCard extends StatelessWidget {
   final DateTime? selectedDate;
   final Function(MoodDiaryModel) onDeleteDiary;
   final Function(MoodDiaryModel)? onEditDiary;
+  final Function(DateTime)? onRetroactiveRecord;
   final VoidCallback onReload;
 
   const RecentDiariesCard({
@@ -17,6 +18,7 @@ class RecentDiariesCard extends StatelessWidget {
     this.selectedDate,
     required this.onDeleteDiary,
     this.onEditDiary,
+    this.onRetroactiveRecord,
     required this.onReload,
   });
 
@@ -32,18 +34,13 @@ class RecentDiariesCard extends StatelessWidget {
           d.createdAt.day == targetDate.day;
     }).toList();
 
+    final bool hasEntries = selectedDateDiaries.isNotEmpty;
     final String cardTitle = '${targetDate.month}月${targetDate.day}日的心情';
 
-    // Outer card ONLY displays 1 entry if available for target date,
-    // otherwise fallback to 1 entry for recent diaries
-    final List<MoodDiaryModel> displayList = selectedDateDiaries.isNotEmpty
-        ? selectedDateDiaries.take(1).toList()
-        : diaries.take(1).toList();
-
     final int dateEntriesCount = selectedDateDiaries.length;
-    final String actionText = dateEntriesCount > 1
-        ? '当日记录 (${dateEntriesCount}条)'
-        : '当日记录';
+    final String actionText = hasEntries
+        ? (dateEntriesCount > 1 ? '当日记录 (${dateEntriesCount}条)' : '当日记录')
+        : '补记心情';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -73,19 +70,25 @@ class RecentDiariesCard extends StatelessWidget {
               ),
               InkWell(
                 onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (ctx) => AllDiariesScreen(
-                        diaries: diaries,
-                        initialDate: targetDate,
-                        onDeleteDiary: onDeleteDiary,
-                        onEditDiary: onEditDiary,
-                        onReload: onReload,
+                  if (hasEntries) {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => AllDiariesScreen(
+                          diaries: diaries,
+                          initialDate: targetDate,
+                          onDeleteDiary: onDeleteDiary,
+                          onEditDiary: onEditDiary,
+                          onReload: onReload,
+                        ),
                       ),
-                    ),
-                  );
-                  onReload();
+                    );
+                    onReload();
+                  } else {
+                    if (onRetroactiveRecord != null) {
+                      onRetroactiveRecord!(targetDate);
+                    }
+                  }
                 },
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
@@ -105,10 +108,10 @@ class RecentDiariesCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 2),
-                      const Icon(
-                        Icons.chevron_right,
+                      Icon(
+                        hasEntries ? Icons.chevron_right : Icons.add,
                         size: 14,
-                        color: Color(0xFF8C52EE),
+                        color: const Color(0xFF8C52EE),
                       ),
                     ],
                   ),
@@ -118,19 +121,67 @@ class RecentDiariesCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          if (displayList.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: Text(
-                  '🌱 ${targetDate.month}月${targetDate.day}日还没有记录心情，写第一篇吧！',
-                  style: TextStyle(color: tc.textSecondary, fontSize: 13),
+          if (!hasEntries)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              decoration: BoxDecoration(
+                color: tc.isDark ? const Color(0xFF221F2E) : const Color(0xFFF9F5FE),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: tc.isDark ? const Color(0xFF332D45) : const Color(0xFFF0E8FC),
                 ),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    '🌱 ${targetDate.month}月${targetDate.day}日还没有记录心情',
+                    style: TextStyle(
+                      color: tc.textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  InkWell(
+                    onTap: () {
+                      if (onRetroactiveRecord != null) {
+                        onRetroactiveRecord!(targetDate);
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8C52EE).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: const Color(0xFF8C52EE).withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.edit_calendar, size: 14, color: Color(0xFF8C52EE)),
+                          const SizedBox(width: 6),
+                          Text(
+                            '补记 ${targetDate.month}月${targetDate.day}日 心情',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF8C52EE),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             )
           else
             Column(
-              children: displayList.map((item) {
+              children: selectedDateDiaries.take(1).map((item) {
                 return DiaryCard(
                   item: item,
                   onDelete: () => onDeleteDiary(item),
