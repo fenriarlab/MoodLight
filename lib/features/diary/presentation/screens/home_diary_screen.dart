@@ -82,10 +82,11 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     });
   }
 
-  void _showRecordSheet({DateTime? defaultDate}) {
+  void _showRecordSheet({DateTime? defaultDate, MoodDiaryModel? existingDiary}) {
     showRecordDiarySheet(
       context,
       defaultDate: defaultDate,
+      existingDiary: existingDiary,
       defaultPresetTags: _defaultPresetTags,
       userCustomTags: _userCustomTags,
       onCustomTagAdded: _saveCustomTag,
@@ -212,6 +213,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                     await _repository.deleteDiary(diary.id);
                     _loadDiaries();
                   },
+                  onEditDiary: (diary) => _showRecordSheet(existingDiary: diary),
                   onReload: _loadDiaries,
                   onTrendTap: () => setState(() => _currentIndex = 1),
                 ),
