@@ -57,4 +57,26 @@ class MoodDiaryModel {
       updatedAt: map['updated_at'] != null ? DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int) : null,
     );
   }
+
+  MoodDiaryModel copyWith({
+    String? id,
+    int? score,
+    String? moodEmoji,
+    String? content,
+    String? themeColor,
+    List<String>? tags,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return MoodDiaryModel(
+      id: id ?? this.id,
+      score: score ?? this.score,
+      moodEmoji: moodEmoji ?? this.moodEmoji,
+      content: content ?? this.content,
+      themeColor: themeColor ?? this.themeColor,
+      tags: tags ?? this.tags,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
+    );
+  }
 }
