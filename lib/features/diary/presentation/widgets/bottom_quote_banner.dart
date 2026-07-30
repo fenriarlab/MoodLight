@@ -28,12 +28,6 @@ class BottomQuoteBanner extends StatelessWidget {
                 end: Alignment.bottomCenter,
               ),
               borderRadius: BorderRadius.circular(30),
-              border: Border(
-                top: BorderSide(
-                  color: Colors.white.withOpacity(0.45),
-                  width: 1.2,
-                ),
-              ),
               boxShadow: [
                 BoxShadow(
                   color: const Color(0xFF8E4BF6).withOpacity(0.45),
