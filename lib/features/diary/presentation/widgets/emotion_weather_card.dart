@@ -43,6 +43,7 @@ class EmotionWeatherCard extends StatelessWidget {
     }
 
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       decoration: BoxDecoration(
