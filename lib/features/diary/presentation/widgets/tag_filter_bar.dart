@@ -23,8 +23,8 @@ class TagFilterBar extends StatelessWidget {
     final allAvailableTags = [...defaultPresetTags, ...userCustomTags];
 
     return Container(
-      height: 48,
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      height: 36,
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -70,7 +70,7 @@ class TagFilterBar extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
           gradient: isSelected
               ? ThemeColors.purpleGradient
