@@ -8,7 +8,7 @@
     -->
 
     <application
-        android:label="MoodLight 心情日记"
+        android:label="MoodLight"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"

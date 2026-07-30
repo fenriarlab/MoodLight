@@ -113,7 +113,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
             Row(
               children: [
                 Text(
-                  '✨ ${l10n?.appTitle ?? "MoodLight 心情日记"}',
+                  '✨ ${l10n?.appTitle ?? "MoodLight"}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
