@@ -36,10 +36,10 @@ class BottomQuoteBanner extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF8E4BF6).withOpacity(0.55),
-                  blurRadius: 18,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 6),
+                  color: const Color(0xFF8E4BF6).withOpacity(0.45),
+                  blurRadius: 12,
+                  spreadRadius: -2,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
