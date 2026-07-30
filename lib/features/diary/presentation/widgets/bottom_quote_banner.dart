@@ -59,8 +59,8 @@ class BottomQuoteBanner extends StatelessWidget {
         // 2. TOP-MOST LAYER: Cat Mascot Leaning Over Purple Button
         // Cat paws 100% overlaying top edge of purple button
         Positioned(
-          right: 14,
-          bottom: 42,
+          right: 16,
+          bottom: 43,
           child: IgnorePointer(
             child: Image.asset(
               'assets/images/cat_header.png',
