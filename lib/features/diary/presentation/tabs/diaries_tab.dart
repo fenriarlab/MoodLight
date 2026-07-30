@@ -101,7 +101,7 @@ class DiariesTab extends StatelessWidget {
               onReload: onReload,
             ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 75),
         ],
       ),
     );
