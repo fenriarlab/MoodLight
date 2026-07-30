@@ -63,7 +63,7 @@ class BottomQuoteBanner extends StatelessWidget {
           bottom: 43,
           child: IgnorePointer(
             child: Image.asset(
-              'assets/images/cat_header.png',
+              'assets/images/cat_footer.png',
               height: 56,
               fit: BoxFit.contain,
             ),
