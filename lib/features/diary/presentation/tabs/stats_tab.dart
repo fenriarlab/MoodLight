@@ -307,7 +307,7 @@ class _StatsTabState extends State<StatsTab> {
                     maxY: 5.5,
                     lineTouchData: LineTouchData(
                       touchTooltipData: LineTouchTooltipData(
-                        getTooltipColor: (spot) => const Color(0xFF2D1F47),
+                        tooltipBgColor: const Color(0xFF2D1F47),
                         tooltipRoundedRadius: 12,
                         getTooltipItems: (touchedSpots) {
                           return touchedSpots.map((spot) {
