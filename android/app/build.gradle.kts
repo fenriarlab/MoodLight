@@ -31,6 +31,17 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // 🌟 自定义输出 APK 档名格式：MoodLight_v1.0.0_release.apk
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            val outputImpl = output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val appName = "MoodLight"
+            val versionName = variant.versionName
+            val buildType = variant.buildType.name
+            outputImpl.outputFileName = "${appName}_v${versionName}_${buildType}.apk"
+        }
+    }
 }
 
 kotlin {
