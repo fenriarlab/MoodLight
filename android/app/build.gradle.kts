@@ -33,14 +33,18 @@ android {
     }
 
     // 🌟 自定义输出 APK 档名格式：MoodLight_v1.0.0_release.apk
-    applicationVariants.all(org.gradle.api.Action { variant ->
-        variant.outputs.all(org.gradle.api.Action { output ->
-            val outputImpl = output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            val appName = "MoodLight"
-            val versionName = variant.versionName
-            val buildType = variant.buildType.name
-            outputImpl.outputFileName = "${appName}_v${versionName}_${buildType}.apk"
-        })
+    applicationVariants.all(object : org.gradle.api.Action<com.android.build.gradle.api.ApplicationVariant> {
+        override fun execute(variant: com.android.build.gradle.api.ApplicationVariant) {
+            variant.outputs.all(object : org.gradle.api.Action<com.android.build.gradle.api.BaseVariantOutput> {
+                override fun execute(output: com.android.build.gradle.api.BaseVariantOutput) {
+                    val outputImpl = output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                    val appName = "MoodLight"
+                    val versionName = variant.versionName
+                    val buildType = variant.buildType.name
+                    outputImpl.outputFileName = "${appName}_v${versionName}_${buildType}.apk"
+                }
+            })
+        }
     })
 }
 
