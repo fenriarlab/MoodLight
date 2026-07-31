@@ -55,228 +55,225 @@ class EmotionWeatherCard extends StatelessWidget {
     }
 
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: tc.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFEFE8FB),
-          width: 1,
-        ),
-        boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          children: [
-            // Left Warm Ambient Glow Gradient Background
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: 110,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: tc.isDark
-                        ? [const Color(0xFF33271F).withOpacity(0.5), Colors.transparent]
-                        : [const Color(0xFFFFF4E5), Colors.white.withOpacity(0.0)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                ),
+      margin: const EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 8),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // 1. Background Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            decoration: BoxDecoration(
+              color: tc.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFEFE8FB),
+                width: 1,
               ),
+              boxShadow: ThemeColors.cardAmbientShadow(tc.isDark),
             ),
-            // Right Warm Sunbeam Ambient Glow Background for Cat Mascot
-            Positioned(
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 140,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: tc.isDark
-                        ? [Colors.transparent, const Color(0xFF382A45).withOpacity(0.6)]
-                        : [Colors.white.withOpacity(0.0), const Color(0xFFFFF3E0)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                ),
-              ),
-            ),
-
-            // Content Columns Layout
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              child: Row(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Stack(
                 children: [
-                  // Col 1: Weather (Far Left)
-                  Expanded(
-                    flex: 9,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '${selectedMonth.month}月情绪天气',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF5A4B7C),
-                          ),
+                  // Left Warm Ambient Glow Gradient Background
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 100,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: tc.isDark
+                              ? [const Color(0xFF33271F).withOpacity(0.5), Colors.transparent]
+                              : [const Color(0xFFFFF4E5), Colors.white.withOpacity(0.0)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          weatherEmoji,
-                          style: const TextStyle(fontSize: 30),
+                      ),
+                    ),
+                  ),
+                  // Right Warm Sunbeam Ambient Glow Background for Cat Mascot
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 130,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: tc.isDark
+                              ? [Colors.transparent, const Color(0xFF382A45).withOpacity(0.6)]
+                              : [Colors.white.withOpacity(0.0), const Color(0xFFFFF3E0)],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          weatherText,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: tc.isDark ? Colors.white : const Color(0xFF2D1F47),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
 
-                  // Divider 1
-                  Container(
-                    width: 1,
-                    height: 50,
-                    color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFF0E8FA),
-                  ),
-
-                  // Col 2: Monthly Avg Score (Middle Left)
-                  Expanded(
-                    flex: 10,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '月平均心情',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: tc.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
+                  // Content Row (|--- 2-Master Column Structure)
+                  Row(
+                    children: [
+                      // Col 1: Weather (Left)
+                      SizedBox(
+                        width: 94,
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              avgFormatted,
-                              style: const TextStyle(
-                                fontSize: 15,
+                              '${selectedMonth.month}月情绪天气',
+                              style: TextStyle(
+                                fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF8C52EE),
+                                color: tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF5A4B7C),
                               ),
                             ),
-                            const SizedBox(width: 3),
+                            const SizedBox(height: 4),
                             Text(
-                              AppColors.getMoodEmoji(avgScore.round()),
-                              style: const TextStyle(fontSize: 15),
+                              weatherEmoji,
+                              style: const TextStyle(fontSize: 30),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              weatherText,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: tc.isDark ? Colors.white : const Color(0xFF2D1F47),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFECE0),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '较上月 $diffFormatted',
-                            style: const TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFFE67E22),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  // Divider 2
-                  Container(
-                    width: 1,
-                    height: 50,
-                    color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFF0E8FA),
-                  ),
+                      // Divider Line
+                      Container(
+                        width: 1,
+                        height: 56,
+                        color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFF0E8FA),
+                      ),
 
-                  // Col 3: Most Frequent Tag (Middle Right)
-                  Expanded(
-                    flex: 9,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '最常出现',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: tc.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF8C52EE).withOpacity(0.12),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              _getMostTagEmoji(mostTag),
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          mostTag,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: tc.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      const SizedBox(width: 12),
 
-                  // Space for Cat Mascot on the Far Right
-                  const SizedBox(width: 72),
+                      // Col 2: Integrated Stats & Most Frequent (|--- Stacked Layout)
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 64),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Top Row: 月平均心情
+                              Row(
+                                children: [
+                                  Text(
+                                    '月平均心情',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: tc.textSecondary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    avgFormatted,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF8C52EE),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    AppColors.getMoodEmoji(avgScore.round()),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFECE0),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '较上月 $diffFormatted',
+                                      style: const TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFE67E22),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              // Horizontal Separator Line
+                              Container(
+                                height: 1,
+                                color: tc.isDark
+                                    ? const Color(0xFF3C335A).withOpacity(0.6)
+                                    : const Color(0xFFF3EDFC),
+                              ),
+
+                              const SizedBox(height: 8),
+
+                              // Bottom Row: 最常出现
+                              Row(
+                                children: [
+                                  Text(
+                                    '最常出现：',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: tc.textSecondary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    _getMostTagEmoji(mostTag),
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    mostTag,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: tc.textPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
+          ),
 
-            // Col 4: Far Right Cat Mascot (cat_header.png)
-            Positioned(
-              right: -6,
-              bottom: -10,
-              top: -6,
-              child: IgnorePointer(
-                child: Image.asset(
-                  'assets/images/cat_header.png',
-                  height: 95,
-                  fit: BoxFit.contain,
-                  errorBuilder: (ctx, err, stack) {
-                    return Image.asset('assets/images/cat_footer.png', height: 95, fit: BoxFit.contain);
-                  },
-                ),
+          // 2. Overhang Out-of-Bounds Cat Mascot (Ears popping up 24px above card top edge!)
+          Positioned(
+            top: -24,
+            right: 0,
+            child: IgnorePointer(
+              child: Image.asset(
+                'assets/images/cat_header.png',
+                height: 108,
+                fit: BoxFit.contain,
+                errorBuilder: (ctx, err, stack) {
+                  return Image.asset('assets/images/cat_footer.png', height: 108, fit: BoxFit.contain);
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
