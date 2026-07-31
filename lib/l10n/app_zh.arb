@@ -75,6 +75,12 @@
   "singleEntryToday": "当日记录",
   "retroactiveShort": "补记",
   "noEntriesOnDate": "🌱 {month}月{day}日还没有记录",
+  "@noEntriesOnDate": {
+    "placeholders": {
+      "month": { "type": "String" },
+      "day": { "type": "String" }
+    }
+  },
   "todayTime": "今天 {time}",
   "yesterdayTime": "昨天 {time}",
   "editDiary": "编辑日记",

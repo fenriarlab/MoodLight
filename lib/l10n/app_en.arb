@@ -75,6 +75,12 @@
   "singleEntryToday": "Today's Entry",
   "retroactiveShort": "Log",
   "noEntriesOnDate": "🌱 No entries for {month}/{day}",
+  "@noEntriesOnDate": {
+    "placeholders": {
+      "month": { "type": "String" },
+      "day": { "type": "String" }
+    }
+  },
   "todayTime": "Today {time}",
   "yesterdayTime": "Yesterday {time}",
   "editDiary": "Edit Entry",
