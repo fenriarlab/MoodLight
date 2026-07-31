@@ -283,13 +283,15 @@ class CalendarGridView extends StatelessWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
                     decoration: BoxDecoration(
-                      color: tc.isDark ? const Color(0xFF1E212A) : const Color(0xFFFAFAFE),
+                      color: dayDiaries.isNotEmpty
+                          ? palette!.baseColor.withOpacity(tc.isDark ? 0.22 : 0.28)
+                          : (tc.isDark ? const Color(0xFF1E212A) : const Color(0xFFFAFAFE)),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: dayDiaries.isNotEmpty
-                            ? palette!.baseColor.withOpacity(tc.isDark ? 0.35 : 0.45)
+                            ? palette!.baseColor.withOpacity(tc.isDark ? 0.15 : 0.25)
                             : (tc.isDark ? const Color(0xFF2E323D) : const Color(0xFFF0ECF7)),
-                        width: 0.8,
+                        width: 0.5,
                       ),
                       boxShadow: [
                         if (isSelected)
@@ -301,7 +303,7 @@ class CalendarGridView extends StatelessWidget {
                           )
                         else if (dayDiaries.isNotEmpty)
                           BoxShadow(
-                            color: palette!.baseColor.withOpacity(tc.isDark ? 0.10 : 0.16),
+                            color: palette!.baseColor.withOpacity(tc.isDark ? 0.08 : 0.14),
                             blurRadius: 8,
                             spreadRadius: 0,
                             offset: const Offset(0, 2),
@@ -318,11 +320,11 @@ class CalendarGridView extends StatelessWidget {
                               child: Container(
                                 decoration: BoxDecoration(
                                   gradient: RadialGradient(
-                                    center: const Alignment(0.55, 0.1),
-                                    radius: 0.95,
+                                    center: const Alignment(0.45, 0.0),
+                                    radius: 0.90,
                                     colors: [
-                                      palette!.baseColor.withOpacity(tc.isDark ? 0.45 : 0.65),
-                                      palette!.baseColor.withOpacity(tc.isDark ? 0.18 : 0.25),
+                                      palette!.baseColor.withOpacity(tc.isDark ? 0.45 : 0.60),
+                                      palette!.baseColor.withOpacity(tc.isDark ? 0.15 : 0.20),
                                       palette!.baseColor.withOpacity(0.0),
                                     ],
                                     stops: const [0.0, 0.55, 1.0],
@@ -331,53 +333,51 @@ class CalendarGridView extends StatelessWidget {
                               ),
                             ),
 
-                          // 2. Date Number (Top-Left corner)
+                          // 2. Date Number (Top-Left corner - Neutral Slate Gray, W500)
                           Positioned(
                             top: 5,
                             left: 7,
                             child: Text(
                               '$dayNum',
                               style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: isSelected || dayDiaries.isNotEmpty ? FontWeight.bold : FontWeight.w500,
-                                color: dayDiaries.isNotEmpty
-                                    ? palette!.textColor
-                                    : (isSelected
+                                fontSize: 11.5,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                color: isSelected
+                                    ? const Color(0xFF8C52EE)
+                                    : (isToday
                                         ? const Color(0xFF8C52EE)
-                                        : (isToday
-                                            ? const Color(0xFF8C52EE)
-                                            : (thisDate.weekday == DateTime.sunday
-                                                ? const Color(0xFFFF6B6B)
-                                                : (thisDate.weekday == DateTime.saturday
-                                                    ? const Color(0xFF8C52EE)
-                                                    : tc.textPrimary)))),
+                                        : (thisDate.weekday == DateTime.sunday
+                                            ? const Color(0xFFFF6B6B)
+                                            : (thisDate.weekday == DateTime.saturday
+                                                ? const Color(0xFF8C52EE)
+                                                : (tc.isDark ? const Color(0xFFC0C7D5) : const Color(0xFF5A6275))))),
                               ),
                             ),
                           ),
 
-                          // 3. Mood Accent Dot (Top-Right corner)
+                          // 3. Mood Accent Dot (Top-Right corner - Soft Semi-transparent Dot)
                           if (dayDiaries.isNotEmpty)
                             Positioned(
                               top: 6,
                               right: 7,
                               child: Container(
-                                width: 5,
-                                height: 5,
+                                width: 4.5,
+                                height: 4.5,
                                 decoration: BoxDecoration(
-                                  color: palette!.dotColor,
+                                  color: palette!.baseColor.withOpacity(tc.isDark ? 0.70 : 0.60),
                                   shape: BoxShape.circle,
                                 ),
                               ),
                             ),
 
-                          // 4. Mood Emoji (Right/Center-Right floating on radial glow)
+                          // 4. Mood Emoji (Right/Center-Right aligned gracefully with midline)
                           if (dayDiaries.isNotEmpty)
                             Positioned(
-                              right: 6,
-                              bottom: 3,
+                              right: 7,
+                              bottom: 4,
                               child: Text(
                                 dayDiaries.last.moodEmoji,
-                                style: const TextStyle(fontSize: 14),
+                                style: const TextStyle(fontSize: 13),
                               ),
                             ),
                         ],
