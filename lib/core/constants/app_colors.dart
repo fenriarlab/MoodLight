@@ -33,11 +33,20 @@ class AppColors {
   static const Color divider = Color(0xFF292E38);
 
   static Color getMoodColor(int score) {
-    if (score >= 3) return moodVeryHappy;
-    if (score >= 1) return moodHappy;
-    if (score == 0) return moodNeutral;
-    if (score >= -2) return moodSad;
-    return moodVerySad;
+    switch (score) {
+      case -5: return const Color(0xFF9FB7E8);
+      case -4: return const Color(0xFFAEC7EE);
+      case -3: return const Color(0xFFBFD5F3);
+      case -2: return const Color(0xFFC9DDF6);
+      case -1: return const Color(0xFFD8D8F6);
+      case 0:  return const Color(0xFFE8E5EF);
+      case 1:  return const Color(0xFFD9F0C8);
+      case 2:  return const Color(0xFFC7EFA8);
+      case 3:  return const Color(0xFFFFE79A);
+      case 4:  return const Color(0xFFFFD36E);
+      case 5:  return const Color(0xFFFFC45C);
+      default: return const Color(0xFFE8E5EF);
+    }
   }
 
   static String getMoodEmoji(int score) {

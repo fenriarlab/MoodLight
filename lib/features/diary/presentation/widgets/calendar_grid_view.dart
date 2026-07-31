@@ -44,74 +44,141 @@ class CalendarGridView extends StatelessWidget {
 
     final score = dayDiaries.last.score;
 
-    if (score >= 4) {
-      // Warm Amber / Yellow (Excited/Joy)
-      return MoodPaletteInfo(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [const Color(0xFF3D321A), const Color(0xFF4F4020)]
-              : [const Color(0xFFFFF8DE), const Color(0xFFFFECC7)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        textColor: isDark ? const Color(0xFFFFB74D) : const Color(0xFFE67E22),
-        dotColor: isDark ? const Color(0xFFFFB74D) : const Color(0xFFF39C12),
-      );
+    switch (score) {
+      case -5:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF1C273C), const Color(0xFF24324D)]
+                : [const Color(0xFF9FB7E8), const Color(0xFFA8BDED)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFB8CDFA) : const Color(0xFF223B68),
+          dotColor: isDark ? const Color(0xFFB8CDFA) : const Color(0xFF223B68),
+        );
+      case -4:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF202B40), const Color(0xFF293752)]
+                : [const Color(0xFFAEC7EE), const Color(0xFFB6CCF1)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFC6DAFD) : const Color(0xFF2D4877),
+          dotColor: isDark ? const Color(0xFFC6DAFD) : const Color(0xFF2D4877),
+        );
+      case -3:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF242F46), const Color(0xFF2E3D59)]
+                : [const Color(0xFFBFD5F3), const Color(0xFFC6DAF6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFD4E5FF) : const Color(0xFF395687),
+          dotColor: isDark ? const Color(0xFFD4E5FF) : const Color(0xFF395687),
+        );
+      case -2:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF27334B), const Color(0xFF324260)]
+                : [const Color(0xFFC9DDF6), const Color(0xFFD0E1F8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFDCEBFF) : const Color(0xFF456396),
+          dotColor: isDark ? const Color(0xFFDCEBFF) : const Color(0xFF456396),
+        );
+      case -1:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF2B324B), const Color(0xFF37405F)]
+                : [const Color(0xFFD8D8F6), const Color(0xFFDDDCF8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFE4E3FE) : const Color(0xFF535388),
+          dotColor: isDark ? const Color(0xFFE4E3FE) : const Color(0xFF535388),
+        );
+      case 0:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF302E45), const Color(0xFF3D3A58)]
+                : [const Color(0xFFE8E5EF), const Color(0xFFECE9F2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFEFE9FA) : const Color(0xFF605278),
+          dotColor: isDark ? const Color(0xFFEFE9FA) : const Color(0xFF605278),
+        );
+      case 1:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF273622), const Color(0xFF31452B)]
+                : [const Color(0xFFD9F0C8), const Color(0xFFDDF3CE)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFC7EBAE) : const Color(0xFF335E20),
+          dotColor: isDark ? const Color(0xFFC7EBAE) : const Color(0xFF335E20),
+        );
+      case 2:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF23351C), const Color(0xFF2B4323)]
+                : [const Color(0xFFC7EFA8), const Color(0xFFCCF1B0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFB7EA92) : const Color(0xFF2A5418),
+          dotColor: isDark ? const Color(0xFFB7EA92) : const Color(0xFF2A5418),
+        );
+      case 3:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF3C341C), const Color(0xFF4C4223)]
+                : [const Color(0xFFFFE79A), const Color(0xFFFFEA9F)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFFFDF80) : const Color(0xFF8C6500),
+          dotColor: isDark ? const Color(0xFFFFDF80) : const Color(0xFF8C6500),
+        );
+      case 4:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF3E2F16), const Color(0xFF4F3B1A)]
+                : [const Color(0xFFFFD36E), const Color(0xFFFFD777)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFFFCB5C) : const Color(0xFF875500),
+          dotColor: isDark ? const Color(0xFFFFCB5C) : const Color(0xFF875500),
+        );
+      case 5:
+      default:
+        return MoodPaletteInfo(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFF402A12), const Color(0xFF523516)]
+                : [const Color(0xFFFFC45C), const Color(0xFFFFC865)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          textColor: isDark ? const Color(0xFFFFBB45) : const Color(0xFF804500),
+          dotColor: isDark ? const Color(0xFFFFBB45) : const Color(0xFF804500),
+        );
     }
-    if (score >= 1) {
-      // Soft Mint Green (Calm/Happy)
-      return MoodPaletteInfo(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [const Color(0xFF1E3824), const Color(0xFF28482F)]
-              : [const Color(0xFFF0FAF0), const Color(0xFFE0F4E2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        textColor: isDark ? const Color(0xFF81C784) : const Color(0xFF27AE60),
-        dotColor: isDark ? const Color(0xFF81C784) : const Color(0xFF2ECC71),
-      );
-    }
-    if (score == 0) {
-      // Soft Lavender Purple (Neutral/Bored)
-      return MoodPaletteInfo(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [const Color(0xFF332342), const Color(0xFF432D56)]
-              : [const Color(0xFFF6F0FA), const Color(0xFFEBE0F4)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        textColor: isDark ? const Color(0xFFBA68C8) : const Color(0xFF8E44AD),
-        dotColor: isDark ? const Color(0xFFBA68C8) : const Color(0xFF9B59B6),
-      );
-    }
-    if (score >= -3) {
-      // Soft Ice Blue (Sad/Low)
-      return MoodPaletteInfo(
-        gradient: LinearGradient(
-          colors: isDark
-              ? [const Color(0xFF1B2E3E), const Color(0xFF243B50)]
-              : [const Color(0xFFEFF5FB), const Color(0xFFE0ECF8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        textColor: isDark ? const Color(0xFF64B5F6) : const Color(0xFF2980B9),
-        dotColor: isDark ? const Color(0xFF64B5F6) : const Color(0xFF3498DB),
-      );
-    }
-    // Angry / Anxious (-4 to -5 - Coral Pink)
-    return MoodPaletteInfo(
-      gradient: LinearGradient(
-        colors: isDark
-            ? [const Color(0xFF422125), const Color(0xFF552A2F)]
-            : [const Color(0xFFFDF0ED), const Color(0xFFFADCD5)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      textColor: isDark ? const Color(0xFFE57373) : const Color(0xFFC0392B),
-      dotColor: isDark ? const Color(0xFFE57373) : const Color(0xFFE74C3C),
-    );
   }
 
   @override
