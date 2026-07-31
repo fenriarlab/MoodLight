@@ -63,6 +63,20 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     }
   }
 
+  Future<void> _deleteCustomTag(String tag) async {
+    final trimmed = tag.trim();
+    if (_userCustomTags.contains(trimmed)) {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _userCustomTags.remove(trimmed);
+        if (_selectedFilterTag == trimmed) {
+          _selectedFilterTag = null;
+        }
+      });
+      await prefs.setStringList('user_custom_tags', _userCustomTags);
+    }
+  }
+
   Future<void> _loadDefaultViewPreference() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -87,6 +101,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
       defaultPresetTags: _defaultPresetTags,
       userCustomTags: _userCustomTags,
       onCustomTagAdded: _saveCustomTag,
+      onCustomTagDeleted: _deleteCustomTag,
       onSaved: _loadDiaries,
     );
   }

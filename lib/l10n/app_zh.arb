@@ -101,6 +101,9 @@
   "noTagData": "🌱 暂无足够标签记录，快去记一笔吧！",
   "timesCount": "{count}次",
   "tagLife": "生活",
+  "deleteCustomTagTitle": "删除自定义标签",
+  "deleteCustomTagConfirm": "确定要删除自定义标签“{tag}”吗？",
+  "delete": "删除",
   "insightHigh": "这段时间你的心情非常阳光欢快！在【{tag}】维度感受到了满满的喜悦与力量 🌟",
   "insightNormal": "这段时间你的心情平稳且充满秩序，在【{tag}】方面保持着极佳的节奏 🌿",
   "insightLow": "这段时间小有波折，在【{tag}】方面可能有些压力，记得给自己放个假咖啡泡起来 ☕"

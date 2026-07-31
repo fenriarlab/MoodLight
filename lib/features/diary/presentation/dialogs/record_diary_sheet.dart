@@ -14,6 +14,7 @@ void showRecordDiarySheet(
   required List<String> defaultPresetTags,
   required List<String> userCustomTags,
   required Function(String) onCustomTagAdded,
+  Function(String)? onCustomTagDeleted,
   required VoidCallback onSaved,
 }) {
   double selectedScore = existingDiary != null ? existingDiary.score.toDouble() : 0;
@@ -54,6 +55,45 @@ void showRecordDiarySheet(
                   : (l10n?.todayMoodTitle ?? '今天心情怎么样？'));
 
           final scoreVal = currentScoreInt > 0 ? '+$currentScoreInt' : '$currentScoreInt';
+
+          void confirmDeleteTag(String tag) {
+            showDialog(
+              context: context,
+              builder: (confirmCtx) => AlertDialog(
+                backgroundColor: tc.surface,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                title: Text(
+                  l10n?.deleteCustomTagTitle ?? '删除自定义标签',
+                  style: TextStyle(color: tc.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                content: Text(
+                  l10n?.deleteCustomTagConfirm(tag) ?? '确定要删除自定义标签“$tag”吗？',
+                  style: TextStyle(color: tc.textSecondary, fontSize: 14),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(confirmCtx),
+                    child: Text(l10n?.cancel ?? '取消', style: TextStyle(color: tc.textSecondary)),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(confirmCtx);
+                      if (onCustomTagDeleted != null) {
+                        onCustomTagDeleted(tag);
+                      }
+                      setModalState(() {
+                        selectedTags.remove(tag);
+                      });
+                    },
+                    child: Text(
+                      l10n?.delete ?? '删除',
+                      style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return Padding(
             padding: EdgeInsets.only(
@@ -217,6 +257,7 @@ void showRecordDiarySheet(
                     children: [
                       ...allAvailableTags.map((tag) {
                         final isSelected = selectedTags.contains(tag);
+                        final isCustom = userCustomTags.contains(tag);
                         return InkWell(
                           onTap: () {
                             setModalState(() {
@@ -227,6 +268,7 @@ void showRecordDiarySheet(
                               }
                             });
                           },
+                          onLongPress: isCustom ? () => confirmDeleteTag(tag) : null,
                           borderRadius: BorderRadius.circular(20),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 180),
@@ -246,15 +288,31 @@ void showRecordDiarySheet(
                                     ]
                                   : [],
                             ),
-                            child: Text(
-                              TagHelper.getLocalizedTag(context, tag),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected
-                                    ? Colors.white
-                                    : (tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF6E5D90)),
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  TagHelper.getLocalizedTag(context, tag),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : (tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF6E5D90)),
+                                  ),
+                                ),
+                                if (isCustom) ...[
+                                  const SizedBox(width: 4),
+                                  GestureDetector(
+                                    onTap: () => confirmDeleteTag(tag),
+                                    child: Icon(
+                                      Icons.cancel,
+                                      size: 14,
+                                      color: isSelected ? Colors.white70 : tc.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         );

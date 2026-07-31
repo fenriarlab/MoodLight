@@ -101,6 +101,9 @@
   "noTagData": "🌱 Not enough tag data yet.",
   "timesCount": "{count} times",
   "tagLife": "Life",
+  "deleteCustomTagTitle": "Delete Custom Tag",
+  "deleteCustomTagConfirm": "Are you sure you want to delete custom tag \"{tag}\"?",
+  "delete": "Delete",
   "insightHigh": "Your mood has been sunny! Feeling great joy in [{tag}] 🌟",
   "insightNormal": "Your mood has been steady and calm with [{tag}] 🌿",
   "insightLow": "You might be facing some stress with [{tag}], remember to take a break ☕"
