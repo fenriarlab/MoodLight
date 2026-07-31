@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
+import '../../../../core/utils/tag_helper.dart';
 import '../../data/models/mood_diary_model.dart';
 
 class StatsTab extends StatefulWidget {
@@ -474,11 +475,11 @@ class _StatsTabState extends State<StatsTab> {
                       child: Row(
                         children: [
                           SizedBox(
-                            width: 65,
+                            width: 75,
                             child: Text(
-                              entry.key,
+                              TagHelper.getLocalizedTag(context, entry.key),
                               style: TextStyle(
-                                fontSize: 12.5,
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: tc.textPrimary,
                               ),
@@ -618,7 +619,8 @@ class _StatsTabState extends State<StatsTab> {
 
   String _getInsightMessage(BuildContext context, double avgScore, List<MapEntry<String, int>> topTags) {
     final l10n = AppLocalizations.of(context);
-    final topTagStr = topTags.isNotEmpty ? topTags.first.key : '生活';
+    final rawTag = topTags.isNotEmpty ? topTags.first.key : '生活';
+    final topTagStr = TagHelper.getLocalizedTag(context, rawTag);
     if (avgScore >= 2.0) {
       return l10n?.insightHigh(topTagStr) ?? '这段时间你的心情非常阳光欢快！在【$topTagStr】维度感受到了满满的喜悦与力量 🌟';
     } else if (avgScore >= 0.0) {

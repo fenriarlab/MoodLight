@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../data/models/mood_diary_model.dart';
 import '../../data/diary_repository.dart';
 import '../dialogs/record_diary_sheet.dart';
-import '../widgets/bottom_quote_banner.dart';
 import '../tabs/diaries_tab.dart';
 import '../tabs/stats_tab.dart';
 import '../tabs/settings_tab.dart';
+import '../widgets/bottom_quote_banner.dart';
 
 class HomeDiaryScreen extends StatefulWidget {
   const HomeDiaryScreen({super.key});
@@ -52,32 +51,30 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     });
   }
 
-  Future<void> _loadDefaultViewPreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final defaultCalendar = prefs.getBool('user_default_view_calendar') ?? true;
-    setState(() {
-      _isCalendarView = defaultCalendar;
-    });
-  }
-
-  void _saveCustomTag(String newTag) {
-    final trimmed = newTag.trim();
+  Future<void> _saveCustomTag(String tag) async {
+    final trimmed = tag.trim();
     if (trimmed.isEmpty) return;
     if (!_defaultPresetTags.contains(trimmed) && !_userCustomTags.contains(trimmed)) {
-      final updated = [..._userCustomTags, trimmed];
+      final prefs = await SharedPreferences.getInstance();
       setState(() {
-        _userCustomTags = updated;
+        _userCustomTags.add(trimmed);
       });
-      SharedPreferences.getInstance().then((prefs) {
-        prefs.setStringList('user_custom_tags', updated);
-      });
+      await prefs.setStringList('user_custom_tags', _userCustomTags);
     }
   }
 
-  Future<void> _loadDiaries() async {
-    final list = await _repository.getAllDiaries();
+  Future<void> _loadDefaultViewPreference() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _diaries = list;
+      _isCalendarView = prefs.getBool('default_home_view_is_calendar') ?? true;
+    });
+  }
+
+  Future<void> _loadDiaries() async {
+    setState(() => _isLoading = true);
+    final data = await _repository.getAllDiaries();
+    setState(() {
+      _diaries = data;
       _isLoading = false;
     });
   }
@@ -96,16 +93,15 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final tc = ThemeColors.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: tc.isDark ? const Color(0xFF14121A) : const Color(0xFFF9F4FE),
+      backgroundColor: tc.surface,
       appBar: AppBar(
-        toolbarHeight: 64,
-        titleSpacing: 16,
         elevation: 0,
-        backgroundColor: tc.isDark ? const Color(0xFF14121A) : const Color(0xFFF9F4FE),
+        backgroundColor: tc.surface,
+        scrolledUnderElevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -124,7 +120,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
             ),
             const SizedBox(height: 2),
             Text(
-              '我的心情，有光照亮',
+              l10n?.appSubtitle ?? '我的心情，有光照亮',
               style: TextStyle(
                 fontSize: 11,
                 color: tc.textSecondary,
@@ -251,7 +247,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
           NavigationDestination(
             icon: Icon(Icons.home_outlined, color: tc.textSecondary),
             selectedIcon: const Icon(Icons.home_rounded, color: Color(0xFF8C52EE)),
-            label: '首页',
+            label: l10n?.tabHome ?? '首页',
           ),
           NavigationDestination(
             icon: Icon(Icons.show_chart_outlined, color: tc.textSecondary),
@@ -261,7 +257,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
           NavigationDestination(
             icon: Icon(Icons.pets_outlined, color: tc.textSecondary),
             selectedIcon: const Icon(Icons.pets_rounded, color: Color(0xFF8C52EE)),
-            label: '我的',
+            label: l10n?.tabProfile ?? '我的',
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
+import '../../../../core/utils/tag_helper.dart';
 import '../../data/models/mood_diary_model.dart';
 
 class EmotionWeatherCard extends StatelessWidget {
@@ -242,17 +243,15 @@ class EmotionWeatherCard extends StatelessWidget {
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  Text(
-                                    _getMostTagEmoji(mostTag),
-                                    style: const TextStyle(fontSize: 13),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    mostTag,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: tc.textPrimary,
+                                  Expanded(
+                                    child: Text(
+                                      TagHelper.getLocalizedTag(context, mostTag),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: tc.textPrimary,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
@@ -286,14 +285,5 @@ class EmotionWeatherCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _getMostTagEmoji(String tag) {
-    if (tag.contains('工作')) return '💼';
-    if (tag.contains('学习')) return '📚';
-    if (tag.contains('家庭')) return '🏠';
-    if (tag.contains('恋爱')) return '❤️';
-    if (tag.contains('平静')) return '🌿';
-    return '✨';
   }
 }

@@ -1,9 +1,12 @@
 {
   "@@locale": "zh",
   "appTitle": "MoodLight",
+  "appSubtitle": "我的心情，有光照亮",
   "offlineBadge": "100% 本地隐私留存",
+  "tabHome": "首页",
   "tabDiaries": "日记",
   "tabStats": "趋势",
+  "tabProfile": "我的",
   "tabSettings": "设置",
   "recordMood": "记心情",
   "averageMood": "近期平均心情",

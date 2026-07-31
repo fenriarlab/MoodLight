@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
+import '../../../../core/utils/tag_helper.dart';
 import '../../data/models/mood_diary_model.dart';
 
 class DiaryCard extends StatelessWidget {
@@ -160,7 +161,7 @@ class DiaryCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            tag,
+                            TagHelper.getLocalizedTag(context, tag),
                             style: const TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
+import '../../../../core/utils/tag_helper.dart';
 import '../../data/models/mood_diary_model.dart';
 import '../../data/diary_repository.dart';
 import 'custom_tag_dialog.dart';
@@ -44,12 +45,13 @@ void showRecordDiarySheet(
                   defaultDate.month != DateTime.now().month ||
                   defaultDate.day != DateTime.now().day);
 
-          final dateStr = "${targetDate.month}月${targetDate.day}日";
+          final isEn = Localizations.localeOf(context).languageCode == 'en';
+          final dateStr = isEn ? "${targetDate.month}/${targetDate.day}" : "${targetDate.month}月${targetDate.day}日";
           final titleText = existingDiary != null
-              ? '编辑 $dateStr 心情'
+              ? (isEn ? 'Edit $dateStr Mood' : '编辑 $dateStr 心情')
               : (isRetroactive
-                  ? '补记 $dateStr 心情'
-                  : '记录今天的心情');
+                  ? (l10n?.retroactiveMoodTitle(dateStr) ?? '补记 $dateStr 心情')
+                  : (l10n?.todayMoodTitle ?? '今天心情怎么样？'));
 
           final scoreVal = currentScoreInt > 0 ? '+$currentScoreInt' : '$currentScoreInt';
 
@@ -158,7 +160,7 @@ void showRecordDiarySheet(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                '分值 $scoreVal',
+                                l10n?.scoreText(scoreVal) ?? '分值 $scoreVal',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -245,7 +247,7 @@ void showRecordDiarySheet(
                                   : [],
                             ),
                             child: Text(
-                              tag,
+                              TagHelper.getLocalizedTag(context, tag),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
@@ -289,12 +291,12 @@ void showRecordDiarySheet(
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.add, size: 14, color: Color(0xFF8C52EE)),
-                              SizedBox(width: 3),
+                            children: [
+                              const Icon(Icons.add, size: 14, color: Color(0xFF8C52EE)),
+                              const SizedBox(width: 3),
                               Text(
-                                '自定义',
-                                style: TextStyle(
+                                l10n?.customTag ?? '+ 自定义',
+                                style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF8C52EE),
@@ -408,10 +410,10 @@ void showRecordDiarySheet(
                       },
                       child: Text(
                         existingDiary != null
-                            ? '保存修改'
+                            ? (isEn ? 'Save Changes' : '保存修改')
                             : (isRetroactive
-                                ? '保存 $dateStr 心情'
-                                : '保存心情日记'),
+                                ? (l10n?.saveRetroactiveMood(dateStr) ?? '保存 $dateStr 心情')
+                                : (l10n?.saveDiary ?? '保存心情日记')),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/theme_colors.dart';
+import '../../../../core/utils/tag_helper.dart';
 
 class TagFilterBar extends StatelessWidget {
   final List<String> defaultPresetTags;
@@ -47,7 +48,7 @@ class TagFilterBar extends StatelessWidget {
               padding: const EdgeInsets.only(right: 8),
               child: _buildGradientChip(
                 context: context,
-                label: tag,
+                label: TagHelper.getLocalizedTag(context, tag),
                 isSelected: isSelected,
                 onTap: () => onTagSelected(isSelected ? null : tag),
                 tc: tc,
@@ -67,31 +68,26 @@ class TagFilterBar extends StatelessWidget {
     required VoidCallback onTap,
     required ThemeColors tc,
   }) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? ThemeColors.purpleGradient
-              : null,
           color: isSelected
-              ? null
-              : (tc.isDark ? const Color(0xFF2A2E37) : Colors.white),
-          borderRadius: BorderRadius.circular(20),
+              ? const Color(0xFF8C52EE)
+              : (tc.isDark ? const Color(0xFF282239) : const Color(0xFFF3ECFE)),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: isSelected
-              ? ThemeColors.purpleGlowShadow()
-              : [
+              ? [
                   BoxShadow(
-                    color: tc.isDark
-                        ? Colors.black.withOpacity(0.2)
-                        : const Color(0xFF9D75F0).withOpacity(0.12),
-                    blurRadius: 8,
-                    spreadRadius: 0,
+                    color: const Color(0xFF8C52EE).withOpacity(0.35),
+                    blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
-                ],
+                ]
+              : [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -99,8 +95,8 @@ class TagFilterBar extends StatelessWidget {
             if (icon != null) ...[
               Icon(
                 icon,
-                size: 14,
-                color: isSelected ? Colors.white : const Color(0xFF8C52EE),
+                size: 13,
+                color: isSelected ? Colors.white : (tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF7A6B9C)),
               ),
               const SizedBox(width: 4),
             ],
@@ -108,8 +104,10 @@ class TagFilterBar extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: isSelected ? Colors.white : tc.textPrimary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected
+                    ? Colors.white
+                    : (tc.isDark ? const Color(0xFFB8B2D1) : const Color(0xFF7A6B9C)),
               ),
             ),
           ],

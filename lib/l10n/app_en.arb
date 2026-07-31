@@ -1,9 +1,12 @@
 {
   "@@locale": "en",
   "appTitle": "MoodLight",
+  "appSubtitle": "Shine a light on your mood",
   "offlineBadge": "100% Offline & Private",
+  "tabHome": "Home",
   "tabDiaries": "Diaries",
   "tabStats": "Stats",
+  "tabProfile": "Profile",
   "tabSettings": "Settings",
   "recordMood": "Log Mood",
   "averageMood": "Average Mood",
