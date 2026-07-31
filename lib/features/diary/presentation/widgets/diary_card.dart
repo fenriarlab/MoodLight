@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../data/models/mood_diary_model.dart';
@@ -15,21 +16,25 @@ class DiaryCard extends StatelessWidget {
     this.onEdit,
   });
 
-  String _formatHumanizedTime(DateTime dt) {
+  String _formatHumanizedTime(BuildContext context, DateTime dt) {
+    final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
     final timeStr = "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
     if (dt.year == now.year && dt.month == now.month && dt.day == now.day) {
-      return "今天 $timeStr";
+      return l10n?.todayTime(timeStr) ?? "今天 $timeStr";
     }
     final yesterday = now.subtract(const Duration(days: 1));
     if (dt.year == yesterday.year && dt.month == yesterday.month && dt.day == yesterday.day) {
-      return "昨天 $timeStr";
+      return l10n?.yesterdayTime(timeStr) ?? "昨天 $timeStr";
     }
-    return "${dt.month}月${dt.day}日 $timeStr";
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    return isEn ? "${dt.month}/${dt.day} $timeStr" : "${dt.month}月${dt.day}日 $timeStr";
   }
 
   void _showOptionsSheet(BuildContext context) {
     final tc = ThemeColors.of(context);
+    final l10n = AppLocalizations.of(context);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: tc.surface,
@@ -43,7 +48,7 @@ class DiaryCard extends StatelessWidget {
               if (onEdit != null)
                 ListTile(
                   leading: const Icon(Icons.edit_outlined, color: Color(0xFF8C52EE)),
-                  title: Text('编辑日记', style: TextStyle(color: tc.textPrimary)),
+                  title: Text(l10n?.editDiary ?? '编辑日记', style: TextStyle(color: tc.textPrimary)),
                   onTap: () {
                     Navigator.pop(ctx);
                     onEdit!();
@@ -51,7 +56,7 @@ class DiaryCard extends StatelessWidget {
                 ),
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Color(0xFFFF6B6B)),
-                title: const Text('删除日记', style: TextStyle(color: Color(0xFFFF6B6B))),
+                title: Text(l10n?.deleteDiary ?? '删除日记', style: const TextStyle(color: Color(0xFFFF6B6B))),
                 onTap: () {
                   Navigator.pop(ctx);
                   onDelete();
@@ -71,24 +76,27 @@ class DiaryCard extends StatelessWidget {
 
     return InkWell(
       onLongPress: () => _showOptionsSheet(context),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: tc.isDark ? const Color(0xFF262A33) : const Color(0xFFFAF7FF),
-          borderRadius: BorderRadius.circular(20),
+          color: tc.isDark ? const Color(0xFF221F2E) : const Color(0xFFF9F5FE),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: tc.isDark ? const Color(0xFF332D45) : const Color(0xFFF0E8FC),
+          ),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Soft Vibrant Circle Emoji Badge (50x50)
+            // Emoji Circular Avatar
             Container(
-              width: 50,
-              height: 50,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: moodColor.withOpacity(0.24),
+                color: moodColor.withOpacity(0.12),
               ),
               child: Center(
                 child: Text(
@@ -97,39 +105,50 @@ class DiaryCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
 
-            // Content & Time Layout (Matching Right Mockup 1:1)
+            // Main Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Humanized Timestamp
-                  Text(
-                    _formatHumanizedTime(item.createdAt),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: tc.isDark ? const Color(0xFFA595C4) : const Color(0xFF8B7AA8),
-                      fontWeight: FontWeight.w500,
-                    ),
+                  // Time & Options Button Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _formatHumanizedTime(context, item.createdAt),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: tc.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => _showOptionsSheet(context),
+                        icon: Icon(Icons.more_horiz, size: 18, color: tc.textSecondary),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 4),
+
+                  // Diary Text Content (Omitted if empty)
                   if (item.content.trim().isNotEmpty) ...[
-                    const SizedBox(height: 3),
                     Text(
                       item.content,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         color: tc.textPrimary,
                         height: 1.35,
-                        fontWeight: FontWeight.w400,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 8),
                   ],
-                  if (item.tags.isNotEmpty) ...[
-                    const SizedBox(height: 6),
+
+                  // Tags Row
+                  if (item.tags.isNotEmpty)
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
@@ -138,20 +157,19 @@ class DiaryCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: const Color(0xFF8C52EE).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             tag,
                             style: const TextStyle(
                               fontSize: 10,
+                              fontWeight: FontWeight.bold,
                               color: Color(0xFF8C52EE),
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         );
                       }).toList(),
                     ),
-                  ],
                 ],
               ),
             ),

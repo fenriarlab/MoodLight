@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class BottomQuoteBanner extends StatelessWidget {
   final DateTime selectedDate;
@@ -12,6 +13,8 @@ class BottomQuoteBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.bottomRight,
@@ -39,12 +42,12 @@ class BottomQuoteBanner extends StatelessWidget {
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.edit, color: Colors.white, size: 17),
-                SizedBox(width: 6),
+              children: [
+                const Icon(Icons.edit, color: Colors.white, size: 17),
+                const SizedBox(width: 6),
                 Text(
-                  '记录心情',
-                  style: TextStyle(
+                  l10n?.recordMood ?? '记录心情',
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

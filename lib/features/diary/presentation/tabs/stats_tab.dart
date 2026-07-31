@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
@@ -29,6 +30,7 @@ class _StatsTabState extends State<StatsTab> {
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
+    final l10n = AppLocalizations.of(context);
     final days = _daysCount;
 
     // Filter diaries for selected timeframe
@@ -39,18 +41,18 @@ class _StatsTabState extends State<StatsTab> {
     final avgScore = MoodCalculator.calculateOverallAverage(filteredDiaries);
     final trendPoints = MoodCalculator.getMoodTrendForDays(widget.diaries, days);
 
-    // Weather text mapping
-    String weatherText = '多云转晴 · 平稳向好';
+    // Weather text mapping with l10n
+    String weatherText = l10n?.weatherClear ?? '多云转晴 · 平稳向好';
     if (avgScore >= 3.0) {
-      weatherText = '晴空万里 · 阳光璀璨';
+      weatherText = l10n?.weatherSunny ?? '晴空万里 · 阳光璀璨';
     } else if (avgScore >= 1.5) {
-      weatherText = '多云转晴 · 平稳向好';
+      weatherText = l10n?.weatherClear ?? '多云转晴 · 平稳向好';
     } else if (avgScore >= 0.0) {
-      weatherText = '微风拂面 · 平静恬淡';
+      weatherText = l10n?.weatherBreeze ?? '微风拂面 · 平静恬淡';
     } else if (avgScore >= -2.0) {
-      weatherText = '偶尔阵雨 · 小有波折';
+      weatherText = l10n?.weatherRain ?? '偶尔阵雨 · 小有波折';
     } else {
-      weatherText = '阴雨连绵 · 释放压力';
+      weatherText = l10n?.weatherStorm ?? '阴雨连绵 · 释放压力';
     }
 
     // Mood Distribution Calculation
@@ -93,9 +95,9 @@ class _StatsTabState extends State<StatsTab> {
           ),
           child: Row(
             children: [
-              _buildSegmentBtn(0, '近 7 天', tc),
-              _buildSegmentBtn(1, '近 30 天', tc),
-              _buildSegmentBtn(2, '本月至今', tc),
+              _buildSegmentBtn(0, l10n?.period7Days ?? '近 7 天', tc),
+              _buildSegmentBtn(1, l10n?.period30Days ?? '近 30 天', tc),
+              _buildSegmentBtn(2, l10n?.periodThisMonth ?? '本月至今', tc),
             ],
           ),
         ),
@@ -129,7 +131,7 @@ class _StatsTabState extends State<StatsTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '情绪气象指数',
+                    l10n?.moodIndexTitle ?? '情绪气象指数',
                     style: TextStyle(
                       color: tc.textSecondary,
                       fontSize: 12,
@@ -151,7 +153,7 @@ class _StatsTabState extends State<StatsTab> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '分',
+                        l10n?.scoreUnit ?? '分',
                         style: TextStyle(
                           fontSize: 13,
                           color: tc.textSecondary,
@@ -227,7 +229,7 @@ class _StatsTabState extends State<StatsTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '心情波动趋势曲线',
+                    l10n?.moodTrendCurveTitle ?? '心情波动趋势曲线',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -235,7 +237,7 @@ class _StatsTabState extends State<StatsTab> {
                     ),
                   ),
                   Text(
-                    '基准线 (0分)',
+                    l10n?.baselineZero ?? '基准线 (0分)',
                     style: TextStyle(
                       fontSize: 11,
                       color: tc.textSecondary,
@@ -316,8 +318,9 @@ class _StatsTabState extends State<StatsTab> {
                               final p = trendPoints[idx];
                               final emoji = AppColors.getMoodEmoji(p.avgScore.round());
                               final valStr = p.avgScore > 0 ? "+${p.avgScore.toStringAsFixed(1)}" : p.avgScore.toStringAsFixed(1);
+                              final ptsUnit = l10n?.scoreUnit ?? '分';
                               return LineTooltipItem(
-                                '${p.date.month}/${p.date.day}\n$emoji $valStr分',
+                                '${p.date.month}/${p.date.day}\n$emoji $valStr$ptsUnit',
                                 const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                               );
                             }
@@ -383,7 +386,7 @@ class _StatsTabState extends State<StatsTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '情绪构成分布',
+                l10n?.moodDistributionTitle ?? '情绪构成分布',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -424,9 +427,9 @@ class _StatsTabState extends State<StatsTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildLegendItem('🌞 欢快', '${(posRatio * 100).toStringAsFixed(0)}%', const Color(0xFFFFB74D), tc),
-                  _buildLegendItem('🌿 平静', '${(neuRatio * 100).toStringAsFixed(0)}%', const Color(0xFF8C52EE), tc),
-                  _buildLegendItem('🌧️ 低落', '${(negRatio * 100).toStringAsFixed(0)}%', const Color(0xFF5C6BC0), tc),
+                  _buildLegendItem(l10n?.distributionSunny ?? '🌞 欢快', '${(posRatio * 100).toStringAsFixed(0)}%', const Color(0xFFFFB74D), tc),
+                  _buildLegendItem(l10n?.distributionCalm ?? '🌿 平静', '${(neuRatio * 100).toStringAsFixed(0)}%', const Color(0xFF8C52EE), tc),
+                  _buildLegendItem(l10n?.distributionRainy ?? '🌧️ 低落', '${(negRatio * 100).toStringAsFixed(0)}%', const Color(0xFF5C6BC0), tc),
                 ],
               ),
             ],
@@ -449,7 +452,7 @@ class _StatsTabState extends State<StatsTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '情绪影响因素',
+                l10n?.moodFactorTitle ?? '情绪影响因素',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -459,7 +462,7 @@ class _StatsTabState extends State<StatsTab> {
               const SizedBox(height: 12),
               if (topTags.isEmpty)
                 Text(
-                  '🌱 暂无足够标签记录，快去记一笔吧！',
+                  l10n?.noTagData ?? '🌱 暂无足够标签记录，快去记一笔吧！',
                   style: TextStyle(color: tc.textSecondary, fontSize: 13),
                 )
               else
@@ -526,7 +529,7 @@ class _StatsTabState extends State<StatsTab> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _getInsightMessage(avgScore, topTags),
+                        _getInsightMessage(context, avgScore, topTags),
                         style: TextStyle(
                           fontSize: 12,
                           color: tc.isDark ? const Color(0xFFC7BEDE) : const Color(0xFF6E5D90),
@@ -613,14 +616,15 @@ class _StatsTabState extends State<StatsTab> {
     );
   }
 
-  String _getInsightMessage(double avgScore, List<MapEntry<String, int>> topTags) {
+  String _getInsightMessage(BuildContext context, double avgScore, List<MapEntry<String, int>> topTags) {
+    final l10n = AppLocalizations.of(context);
     final topTagStr = topTags.isNotEmpty ? topTags.first.key : '生活';
     if (avgScore >= 2.0) {
-      return '这段时间你的心情非常阳光欢快！在【$topTagStr】维度感受到了满满的喜悦与力量 🌟';
+      return l10n?.insightHigh(topTagStr) ?? '这段时间你的心情非常阳光欢快！在【$topTagStr】维度感受到了满满的喜悦与力量 🌟';
     } else if (avgScore >= 0.0) {
-      return '这段时间你的心情平稳且充满秩序，在【$topTagStr】方面保持着极佳的节奏 🌿';
+      return l10n?.insightNormal(topTagStr) ?? '这段时间你的心情平稳且充满秩序，在【$topTagStr】方面保持着极佳的节奏 🌿';
     } else {
-      return '这段时间小有波折，在【$topTagStr】方面可能有些压力，记得给自己放个假咖啡泡起来 ☕';
+      return l10n?.insightLow(topTagStr) ?? '这段时间小有波折，在【$topTagStr】方面可能有些压力，记得给自己放个假咖啡泡起来 ☕';
     }
   }
 }

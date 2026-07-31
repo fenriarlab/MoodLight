@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
@@ -17,6 +18,8 @@ class EmotionWeatherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
+    final l10n = AppLocalizations.of(context);
+
     final monthDiaries = diaries
         .where((d) => d.createdAt.year == selectedMonth.year && d.createdAt.month == selectedMonth.month)
         .toList();
@@ -34,25 +37,30 @@ class EmotionWeatherCard extends StatelessWidget {
     final avgFormatted = avgScore > 0 ? "+${avgScore.toStringAsFixed(1)}" : avgScore.toStringAsFixed(1);
     final mostTag = MoodCalculator.getMostFrequentTag(diaries);
 
-    // Weather mapping
+    // Weather mapping with l10n
     String weatherEmoji = '⛅';
-    String weatherText = '多云转晴';
+    String weatherText = l10n?.weatherClear ?? '多云转晴 · 平稳向好';
     if (avgScore >= 3.0) {
       weatherEmoji = '☀️';
-      weatherText = '晴空万里';
+      weatherText = l10n?.weatherSunny ?? '晴空万里 · 阳光璀璨';
     } else if (avgScore >= 1.5) {
       weatherEmoji = '⛅';
-      weatherText = '多云转晴';
+      weatherText = l10n?.weatherClear ?? '多云转晴 · 平稳向好';
     } else if (avgScore >= 0.0) {
       weatherEmoji = '🌤️';
-      weatherText = '微风拂面';
+      weatherText = l10n?.weatherBreeze ?? '微风拂面 · 平静恬淡';
     } else if (avgScore >= -2.0) {
       weatherEmoji = '🌧️';
-      weatherText = '偶尔阵雨';
+      weatherText = l10n?.weatherRain ?? '偶尔阵雨 · 小有波折';
     } else {
       weatherEmoji = '🌩️';
-      weatherText = '阴雨连绵';
+      weatherText = l10n?.weatherStorm ?? '阴雨连绵 · 释放压力';
     }
+
+    final cardTitle = l10n?.emotionWeatherTitle(selectedMonth.month.toString()) ?? '${selectedMonth.month}月情绪天气';
+    final monthAvgTitle = l10n?.monthAvgMoodTitle ?? '月平均心情';
+    final comparedText = l10n?.comparedToLastMonth(diffFormatted) ?? '较上月 $diffFormatted';
+    final mostFreqTitle = l10n?.mostFrequentTitle ?? '最常出现：';
 
     return Container(
       margin: const EdgeInsets.only(top: 20, left: 16, right: 16, bottom: 8),
@@ -123,7 +131,7 @@ class EmotionWeatherCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '${selectedMonth.month}月情绪天气',
+                              cardTitle,
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -137,7 +145,7 @@ class EmotionWeatherCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              weatherText,
+                              weatherText.split(' · ').first,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -167,7 +175,7 @@ class EmotionWeatherCard extends StatelessWidget {
                             children: [
                               // Line 1: 月平均心情 (Title)
                               Text(
-                                '月平均心情',
+                                monthAvgTitle,
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: tc.textSecondary,
@@ -200,7 +208,7 @@ class EmotionWeatherCard extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      '较上月 $diffFormatted',
+                                      comparedText,
                                       style: const TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.bold,
@@ -227,7 +235,7 @@ class EmotionWeatherCard extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    '最常出现：',
+                                    mostFreqTitle,
                                     style: TextStyle(
                                       fontSize: 11,
                                       color: tc.textSecondary,

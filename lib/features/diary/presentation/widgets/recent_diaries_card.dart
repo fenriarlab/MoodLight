@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../data/models/mood_diary_model.dart';
 import '../screens/all_diaries_screen.dart';
@@ -25,6 +26,7 @@ class RecentDiariesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
+    final l10n = AppLocalizations.of(context);
     final DateTime targetDate = selectedDate ?? DateTime.now();
 
     // Filter diaries for the selected date
@@ -35,13 +37,20 @@ class RecentDiariesCard extends StatelessWidget {
     }).toList();
 
     final bool hasEntries = selectedDateDiaries.isNotEmpty;
-    // Show only the date in top left title to prevent "心情" word clutter
-    final String cardTitle = '${targetDate.month}月${targetDate.day}日';
+    final isEn = Localizations.localeOf(context).languageCode == 'en';
+    final String cardTitle = isEn
+        ? '${targetDate.month}/${targetDate.day}'
+        : '${targetDate.month}月${targetDate.day}日';
 
     final int dateEntriesCount = selectedDateDiaries.length;
     final String actionText = hasEntries
-        ? (dateEntriesCount > 1 ? '当日记录 (${dateEntriesCount}条)' : '当日记录')
-        : '补记';
+        ? (dateEntriesCount > 1
+            ? (l10n?.dateEntriesCount(dateEntriesCount.toString()) ?? '当日记录 (${dateEntriesCount}条)')
+            : (l10n?.singleEntryToday ?? '当日记录'))
+        : (l10n?.retroactiveShort ?? '补记');
+
+    final String noEntriesText = l10n?.noEntriesOnDate(targetDate.month.toString(), targetDate.day.toString()) ??
+        '🌱 ${targetDate.month}月${targetDate.day}日还没有记录';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -142,7 +151,7 @@ class RecentDiariesCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    '🌱 ${targetDate.month}月${targetDate.day}日还没有记录',
+                    noEntriesText,
                     style: TextStyle(
                       color: tc.textSecondary,
                       fontSize: 13,

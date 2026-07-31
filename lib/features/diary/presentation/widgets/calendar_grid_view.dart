@@ -207,9 +207,9 @@ class CalendarGridView extends StatelessWidget {
                         children: [
                           const Icon(Icons.show_chart, size: 14, color: Color(0xFF8C52EE)),
                           const SizedBox(width: 4),
-                          const Text(
-                            '情绪趋势',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF8C52EE)),
+                          Text(
+                            l10n?.moodTrendButton ?? '情绪趋势',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF8C52EE)),
                           ),
                         ],
                       ),
