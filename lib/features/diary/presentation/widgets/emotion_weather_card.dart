@@ -151,46 +151,48 @@ class EmotionWeatherCard extends StatelessWidget {
                       // Divider Line
                       Container(
                         width: 1,
-                        height: 56,
+                        height: 60,
                         color: tc.isDark ? const Color(0xFF3C335A) : const Color(0xFFF0E8FA),
                       ),
 
                       const SizedBox(width: 12),
 
-                      // Col 2: Integrated Stats & Most Frequent (|--- Stacked Layout)
+                      // Col 2: Integrated Stats (2-Line Monthly Avg + Single Line Most Frequent)
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(right: 64),
+                          padding: const EdgeInsets.only(right: 68),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Top Row: 月平均心情
+                              // Line 1: 月平均心情 (Title)
+                              Text(
+                                '月平均心情',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: tc.textSecondary,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+
+                              // Line 2: Score + Emoji + Difference Badge
                               Row(
                                 children: [
                                   Text(
-                                    '月平均心情',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: tc.textSecondary,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
                                     avgFormatted,
                                     style: const TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFF8C52EE),
                                     ),
                                   ),
-                                  const SizedBox(width: 2),
+                                  const SizedBox(width: 3),
                                   Text(
                                     AppColors.getMoodEmoji(avgScore.round()),
-                                    style: const TextStyle(fontSize: 14),
+                                    style: const TextStyle(fontSize: 15),
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 6),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                                     decoration: BoxDecoration(
@@ -221,7 +223,7 @@ class EmotionWeatherCard extends StatelessWidget {
 
                               const SizedBox(height: 8),
 
-                              // Bottom Row: 最常出现
+                              // Line 3: 最常出现
                               Row(
                                 children: [
                                   Text(
@@ -258,17 +260,17 @@ class EmotionWeatherCard extends StatelessWidget {
             ),
           ),
 
-          // 2. Overhang Out-of-Bounds Cat Mascot (Ears popping up 24px above card top edge!)
+          // 2. Cat Mascot Flush with Banner Bottom & Ears Popping Up Top
           Positioned(
-            top: -24,
-            right: 0,
+            top: -20,
+            bottom: 0,
+            right: -2,
             child: IgnorePointer(
               child: Image.asset(
                 'assets/images/cat_header.png',
-                height: 108,
-                fit: BoxFit.contain,
+                fit: BoxFit.fitHeight,
                 errorBuilder: (ctx, err, stack) {
-                  return Image.asset('assets/images/cat_footer.png', height: 108, fit: BoxFit.contain);
+                  return Image.asset('assets/images/cat_footer.png', fit: BoxFit.fitHeight);
                 },
               ),
             ),
