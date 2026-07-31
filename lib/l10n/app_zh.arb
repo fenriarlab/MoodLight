@@ -52,7 +52,7 @@
   "trendChartTitle": "近 7 天心情波动趋势",
   "exportDataSubtitle": "一键备份本地所有心情日记，方便导入或迁移。",
   "associateTags": "关联标签 (可多选):",
-  "customTag": "+ 自定义",
+  "customTag": "自定义",
   "todayMoodTitle": "今天心情怎么样？",
   "retroactiveMoodTitle": "补记 {date} 心情",
   "saveRetroactiveMood": "保存 {date} 心情",

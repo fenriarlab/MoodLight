@@ -52,7 +52,7 @@
   "trendChartTitle": "7-Day Mood Trend",
   "exportDataSubtitle": "Backup all local mood entries for easy export or migration.",
   "associateTags": "Tags (Multi-select):",
-  "customTag": "+ Custom",
+  "customTag": "Custom",
   "todayMoodTitle": "How are you feeling today?",
   "retroactiveMoodTitle": "Log Mood for {date}",
   "saveRetroactiveMood": "Save Mood for {date}",

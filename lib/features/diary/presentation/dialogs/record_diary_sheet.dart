@@ -350,7 +350,7 @@ void showRecordDiarySheet(
                               const Icon(Icons.add, size: 14, color: Color(0xFF8C52EE)),
                               const SizedBox(width: 3),
                               Text(
-                                l10n?.customTag ?? '+ 自定义',
+                                l10n?.customTag ?? '自定义',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
