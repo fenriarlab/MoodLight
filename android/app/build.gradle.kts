@@ -32,7 +32,7 @@ android {
         }
     }
 
-    // 🌟 自定义输出 APK 档名格式：MoodLight_v1.0.0_release.apk
+    // 🌟 自定义 Android 原生输出 APK 档名格式：MoodLight_v1.0.0_release.apk
     applicationVariants.all(object : org.gradle.api.Action<com.android.build.gradle.api.ApplicationVariant> {
         override fun execute(variant: com.android.build.gradle.api.ApplicationVariant) {
             variant.outputs.all(object : org.gradle.api.Action<com.android.build.gradle.api.BaseVariantOutput> {
@@ -46,6 +46,21 @@ android {
             })
         }
     })
+}
+
+// 🌟 自动生成 Flutter 输出目录下的自定义命名副本：MoodLight_v1.0.0_release.apk
+tasks.whenTaskAdded {
+    if (name.startsWith("assemble")) {
+        doLast {
+            val flutterApkDir = file("../../build/app/outputs/flutter-apk")
+            val defaultApk = file("$flutterApkDir/app-release.apk")
+            val versionName = android.defaultConfig.versionName ?: "1.0.0"
+            if (defaultApk.exists()) {
+                val customApk = file("$flutterApkDir/MoodLight_v${versionName}_release.apk")
+                defaultApk.copyTo(customApk, overwrite = true)
+            }
+        }
+    }
 }
 
 kotlin {
