@@ -286,12 +286,10 @@ class CalendarGridView extends StatelessWidget {
                       color: tc.isDark ? const Color(0xFF1E212A) : const Color(0xFFFAFAFE),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFF8C52EE)
-                            : (dayDiaries.isNotEmpty
-                                ? palette!.baseColor.withOpacity(tc.isDark ? 0.35 : 0.45)
-                                : (tc.isDark ? const Color(0xFF2E323D) : const Color(0xFFF0ECF7))),
-                        width: isSelected ? 1.5 : 0.8,
+                        color: dayDiaries.isNotEmpty
+                            ? palette!.baseColor.withOpacity(tc.isDark ? 0.35 : 0.45)
+                            : (tc.isDark ? const Color(0xFF2E323D) : const Color(0xFFF0ECF7)),
+                        width: 0.8,
                       ),
                       boxShadow: [
                         if (isSelected)
