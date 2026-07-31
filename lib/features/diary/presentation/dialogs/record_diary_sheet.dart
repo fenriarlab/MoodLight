@@ -268,9 +268,6 @@ void showRecordDiarySheet(
                             if (trimmed.isNotEmpty) {
                               onCustomTagAdded(trimmed);
                               setModalState(() {
-                                if (!userCustomTags.contains(trimmed)) {
-                                  userCustomTags.add(trimmed);
-                                }
                                 if (!selectedTags.contains(trimmed)) {
                                   selectedTags.add(trimmed);
                                 }
