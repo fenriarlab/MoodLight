@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../../../core/utils/mood_calculator.dart';
 import '../../data/models/mood_diary_model.dart';
 
 class MoodPaletteInfo {
-  final LinearGradient gradient;
+  final Color baseColor;
   final Color textColor;
   final Color dotColor;
 
   MoodPaletteInfo({
-    required this.gradient,
+    required this.baseColor,
     required this.textColor,
     required this.dotColor,
   });
@@ -47,144 +46,87 @@ class CalendarGridView extends StatelessWidget {
     switch (score) {
       case -5:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF1C273C), const Color(0xFF24324D)]
-                : [const Color(0xFF9FB7E8), const Color(0xFFA8BDED)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFF9FB7E8),
           textColor: isDark ? const Color(0xFFB8CDFA) : const Color(0xFF223B68),
           dotColor: isDark ? const Color(0xFFB8CDFA) : const Color(0xFF223B68),
         );
       case -4:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF202B40), const Color(0xFF293752)]
-                : [const Color(0xFFAEC7EE), const Color(0xFFB6CCF1)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFAEC7EE),
           textColor: isDark ? const Color(0xFFC6DAFD) : const Color(0xFF2D4877),
           dotColor: isDark ? const Color(0xFFC6DAFD) : const Color(0xFF2D4877),
         );
       case -3:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF242F46), const Color(0xFF2E3D59)]
-                : [const Color(0xFFBFD5F3), const Color(0xFFC6DAF6)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFBFD5F3),
           textColor: isDark ? const Color(0xFFD4E5FF) : const Color(0xFF395687),
           dotColor: isDark ? const Color(0xFFD4E5FF) : const Color(0xFF395687),
         );
       case -2:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF27334B), const Color(0xFF324260)]
-                : [const Color(0xFFC9DDF6), const Color(0xFFD0E1F8)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFC9DDF6),
           textColor: isDark ? const Color(0xFFDCEBFF) : const Color(0xFF456396),
           dotColor: isDark ? const Color(0xFFDCEBFF) : const Color(0xFF456396),
         );
       case -1:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF2B324B), const Color(0xFF37405F)]
-                : [const Color(0xFFD8D8F6), const Color(0xFFDDDCF8)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFD8D8F6),
           textColor: isDark ? const Color(0xFFE4E3FE) : const Color(0xFF535388),
           dotColor: isDark ? const Color(0xFFE4E3FE) : const Color(0xFF535388),
         );
       case 0:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF302E45), const Color(0xFF3D3A58)]
-                : [const Color(0xFFE8E5EF), const Color(0xFFECE9F2)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFE8E5EF),
           textColor: isDark ? const Color(0xFFEFE9FA) : const Color(0xFF605278),
           dotColor: isDark ? const Color(0xFFEFE9FA) : const Color(0xFF605278),
         );
       case 1:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF273622), const Color(0xFF31452B)]
-                : [const Color(0xFFD9F0C8), const Color(0xFFDDF3CE)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFD9F0C8),
           textColor: isDark ? const Color(0xFFC7EBAE) : const Color(0xFF335E20),
           dotColor: isDark ? const Color(0xFFC7EBAE) : const Color(0xFF335E20),
         );
       case 2:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF23351C), const Color(0xFF2B4323)]
-                : [const Color(0xFFC7EFA8), const Color(0xFFCCF1B0)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFC7EFA8),
           textColor: isDark ? const Color(0xFFB7EA92) : const Color(0xFF2A5418),
           dotColor: isDark ? const Color(0xFFB7EA92) : const Color(0xFF2A5418),
         );
       case 3:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF3C341C), const Color(0xFF4C4223)]
-                : [const Color(0xFFFFE79A), const Color(0xFFFFEA9F)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFFFE79A),
           textColor: isDark ? const Color(0xFFFFDF80) : const Color(0xFF8C6500),
           dotColor: isDark ? const Color(0xFFFFDF80) : const Color(0xFF8C6500),
         );
       case 4:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF3E2F16), const Color(0xFF4F3B1A)]
-                : [const Color(0xFFFFD36E), const Color(0xFFFFD777)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFFFD36E),
           textColor: isDark ? const Color(0xFFFFCB5C) : const Color(0xFF875500),
           dotColor: isDark ? const Color(0xFFFFCB5C) : const Color(0xFF875500),
         );
       case 5:
       default:
         return MoodPaletteInfo(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [const Color(0xFF402A12), const Color(0xFF523516)]
-                : [const Color(0xFFFFC45C), const Color(0xFFFFC865)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          baseColor: const Color(0xFFFFC45C),
           textColor: isDark ? const Color(0xFFFFBB45) : const Color(0xFF804500),
           dotColor: isDark ? const Color(0xFFFFBB45) : const Color(0xFF804500),
         );
     }
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
     final l10n = AppLocalizations.of(context);
+
     final year = selectedMonth.year;
     final month = selectedMonth.month;
     final daysInMonth = DateUtils.getDaysInMonth(year, month);
@@ -192,8 +134,6 @@ class CalendarGridView extends StatelessWidget {
 
     final groupedMap = MoodCalculator.groupDiariesByDate(diaries);
     final now = DateTime.now();
-
-    final monthYearFormat = Localizations.localeOf(context).languageCode == 'en' ? 'MMMM yyyy' : 'yyyy 年 MM 月';
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -303,7 +243,7 @@ class CalendarGridView extends StatelessWidget {
             ),
           ),
 
-          // 3. 7-Column Calendar Cells (Target Horizontal Capsules)
+          // 3. 7-Column Calendar Cells (Watercolor Radial Glow Capsules)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: GridView.builder(
@@ -312,9 +252,9 @@ class CalendarGridView extends StatelessWidget {
               itemCount: firstWeekday + daysInMonth,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 7,
-                childAspectRatio: 1.42,
-                mainAxisSpacing: 5,
-                crossAxisSpacing: 5,
+                childAspectRatio: 1.38,
+                mainAxisSpacing: 6,
+                crossAxisSpacing: 6,
               ),
               itemBuilder: (ctx, index) {
                 if (index < firstWeekday) {
@@ -330,7 +270,6 @@ class CalendarGridView extends StatelessWidget {
 
                 final dayDiaries = groupedMap[dateKey] ?? [];
                 final palette = _getPastelPalette(dayDiaries, tc.isDark);
-                Color cellColor = tc.isDark ? const Color(0xFF242831) : const Color(0xFFFAF8FD);
 
                 return InkWell(
                   onTap: () {
@@ -340,101 +279,111 @@ class CalendarGridView extends StatelessWidget {
                     onDateSelected(thisDate);
                     onRetroactiveRecord(thisDate);
                   },
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.circular(12),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
+                    duration: const Duration(milliseconds: 180),
                     decoration: BoxDecoration(
-                      color: palette == null ? cellColor : null,
-                      gradient: palette?.gradient,
-                      borderRadius: BorderRadius.circular(9),
-                      // KEEP USER'S PREFERRED AMBIENT PURPLE / MOOD GLOW HALO FOR SELECTED DATE
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: (dayDiaries.isNotEmpty
-                                        ? palette!.textColor
-                                        : const Color(0xFF8C52EE))
-                                    .withOpacity(0.65),
-                                blurRadius: 14,
-                                spreadRadius: 2,
-                              ),
-                            ]
-                          : null,
-                    ),
-                    child: Stack(
-                      children: [
-                        // Main Cell Content (Date Number + Emoji Row)
-                        Center(
-                          child: dayDiaries.isNotEmpty
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '$dayNum',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: palette!.textColor,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                      dayDiaries.last.moodEmoji,
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ],
-                                )
-                              : Text(
-                                  '$dayNum',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: isSelected || isToday ? FontWeight.bold : FontWeight.w500,
-                                    color: isToday
-                                        ? const Color(0xFF8C52EE)
-                                        : tc.textSecondary,
-                                  ),
-                                ),
-                        ),
-
-                        // Top Right Dot Indicator for entries
-                        if (dayDiaries.isNotEmpty)
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: Container(
-                              width: 4,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: palette!.dotColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-
-                        // Multiple Diaries Count Pill (Dark Grey/Purple Capsule Badge)
-                        if (dayDiaries.length > 1)
-                          Positioned(
-                            top: 2,
-                            right: 2,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: tc.isDark
-                                    ? const Color(0xFF4A405A)
-                                    : const Color(0xFF433B54),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '${dayDiaries.length}',
-                                style: const TextStyle(
-                                  fontSize: 8,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                      color: tc.isDark ? const Color(0xFF1E212A) : const Color(0xFFFAFAFE),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? const Color(0xFF8C52EE)
+                            : (dayDiaries.isNotEmpty
+                                ? palette!.baseColor.withOpacity(tc.isDark ? 0.35 : 0.45)
+                                : (tc.isDark ? const Color(0xFF2E323D) : const Color(0xFFF0ECF7))),
+                        width: isSelected ? 1.5 : 0.8,
+                      ),
+                      boxShadow: [
+                        if (isSelected)
+                          BoxShadow(
+                            color: (dayDiaries.isNotEmpty ? palette!.baseColor : const Color(0xFF8C52EE)).withOpacity(0.50),
+                            blurRadius: 12,
+                            spreadRadius: 1,
+                            offset: const Offset(0, 2),
+                          )
+                        else if (dayDiaries.isNotEmpty)
+                          BoxShadow(
+                            color: palette!.baseColor.withOpacity(tc.isDark ? 0.10 : 0.16),
+                            blurRadius: 8,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 2),
                           ),
                       ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Stack(
+                        children: [
+                          // 1. Radial Glow Halo Overlay (水彩径向柔光色晕)
+                          if (dayDiaries.isNotEmpty)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: RadialGradient(
+                                    center: const Alignment(0.55, 0.1),
+                                    radius: 0.95,
+                                    colors: [
+                                      palette!.baseColor.withOpacity(tc.isDark ? 0.45 : 0.65),
+                                      palette!.baseColor.withOpacity(tc.isDark ? 0.18 : 0.25),
+                                      palette!.baseColor.withOpacity(0.0),
+                                    ],
+                                    stops: const [0.0, 0.55, 1.0],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                          // 2. Date Number (Top-Left corner)
+                          Positioned(
+                            top: 5,
+                            left: 7,
+                            child: Text(
+                              '$dayNum',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isSelected || dayDiaries.isNotEmpty ? FontWeight.bold : FontWeight.w500,
+                                color: dayDiaries.isNotEmpty
+                                    ? palette!.textColor
+                                    : (isSelected
+                                        ? const Color(0xFF8C52EE)
+                                        : (isToday
+                                            ? const Color(0xFF8C52EE)
+                                            : (thisDate.weekday == DateTime.sunday
+                                                ? const Color(0xFFFF6B6B)
+                                                : (thisDate.weekday == DateTime.saturday
+                                                    ? const Color(0xFF8C52EE)
+                                                    : tc.textPrimary)))),
+                              ),
+                            ),
+                          ),
+
+                          // 3. Mood Accent Dot (Top-Right corner)
+                          if (dayDiaries.isNotEmpty)
+                            Positioned(
+                              top: 6,
+                              right: 7,
+                              child: Container(
+                                width: 5,
+                                height: 5,
+                                decoration: BoxDecoration(
+                                  color: palette!.dotColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+
+                          // 4. Mood Emoji (Right/Center-Right floating on radial glow)
+                          if (dayDiaries.isNotEmpty)
+                            Positioned(
+                              right: 6,
+                              bottom: 3,
+                              child: Text(
+                                dayDiaries.last.moodEmoji,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -444,13 +393,5 @@ class CalendarGridView extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[month - 1];
   }
 }
