@@ -42,13 +42,6 @@ class RecentDiariesCard extends StatelessWidget {
         ? '${targetDate.month}/${targetDate.day}'
         : '${targetDate.month}月${targetDate.day}日';
 
-    final int dateEntriesCount = selectedDateDiaries.length;
-    final String actionText = hasEntries
-        ? (dateEntriesCount > 1
-            ? (l10n?.dateEntriesCount(dateEntriesCount.toString()) ?? '当日记录 (${dateEntriesCount}条)')
-            : (l10n?.singleEntryToday ?? '当日记录'))
-        : (l10n?.retroactiveShort ?? '补记');
-
     final String noEntriesText = l10n?.noEntriesOnDate(targetDate.month.toString(), targetDate.day.toString()) ??
         '🌱 ${targetDate.month}月${targetDate.day}日还没有记录';
 
@@ -66,7 +59,7 @@ class RecentDiariesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Bar
+          // Clean Header Bar
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -78,9 +71,9 @@ class RecentDiariesCard extends StatelessWidget {
                   color: tc.textPrimary,
                 ),
               ),
-              InkWell(
-                onTap: () async {
-                  if (hasEntries) {
+              if (hasEntries)
+                InkWell(
+                  onTap: () async {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -94,39 +87,17 @@ class RecentDiariesCard extends StatelessWidget {
                       ),
                     );
                     onReload();
-                  } else {
-                    if (onRetroactiveRecord != null) {
-                      onRetroactiveRecord!(targetDate);
-                    }
-                  }
-                },
-                borderRadius: BorderRadius.circular(14),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8C52EE).withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        actionText,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF8C52EE),
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      Icon(
-                        hasEntries ? Icons.chevron_right : Icons.add,
-                        size: 14,
-                        color: const Color(0xFF8C52EE),
-                      ),
-                    ],
+                  },
+                  borderRadius: BorderRadius.circular(14),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: tc.textSecondary,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 12),
