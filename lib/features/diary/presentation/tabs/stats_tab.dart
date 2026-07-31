@@ -499,7 +499,7 @@ class _StatsTabState extends State<StatsTab> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            '${entry.value}次',
+                            l10n?.timesCount(entry.value.toString()) ?? '${entry.value}次',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -619,7 +619,7 @@ class _StatsTabState extends State<StatsTab> {
 
   String _getInsightMessage(BuildContext context, double avgScore, List<MapEntry<String, int>> topTags) {
     final l10n = AppLocalizations.of(context);
-    final rawTag = topTags.isNotEmpty ? topTags.first.key : '生活';
+    final rawTag = topTags.isNotEmpty ? topTags.first.key : (l10n?.tagLife ?? '生活');
     final topTagStr = TagHelper.getLocalizedTag(context, rawTag);
     if (avgScore >= 2.0) {
       return l10n?.insightHigh(topTagStr) ?? '这段时间你的心情非常阳光欢快！在【$topTagStr】维度感受到了满满的喜悦与力量 🌟';
