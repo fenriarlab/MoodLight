@@ -8,8 +8,16 @@ import '../../data/models/mood_diary_model.dart';
 void showExportDataDialog(BuildContext context, List<MoodDiaryModel> diaries) {
   final tc = ThemeColors.of(context);
   final l10n = AppLocalizations.of(context);
-  final jsonList = diaries.map((d) => d.toMap()).toList();
-  final jsonString = const JsonEncoder.withIndent('  ').convert(jsonList);
+
+  final exportPayload = {
+    'schema_version': 1,
+    'app_name': 'MoodLight',
+    'exported_at': DateTime.now().toIso8601String(),
+    'total_count': diaries.length,
+    'diaries': diaries.map((d) => d.toMap()).toList(),
+  };
+
+  final jsonString = const JsonEncoder.withIndent('  ').convert(exportPayload);
 
   showDialog(
     context: context,
