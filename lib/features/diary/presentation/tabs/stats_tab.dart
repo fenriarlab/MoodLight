@@ -21,6 +21,7 @@ class StatsTab extends StatefulWidget {
 
 class _StatsTabState extends State<StatsTab> {
   int _selectedPeriod = 0; // 0: 7天, 1: 30天, 2: 本月
+  int _touchedPieIndex = -1;
 
   int get _daysCount {
     if (_selectedPeriod == 0) return 7;
@@ -372,9 +373,9 @@ class _StatsTabState extends State<StatsTab> {
         ),
         const SizedBox(height: 16),
 
-        // 4. Mood Distribution Progress Card
+        // 4. Mood Distribution Doughnut Chart Card
         Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: tc.surface,
             borderRadius: BorderRadius.circular(24),
@@ -386,53 +387,169 @@ class _StatsTabState extends State<StatsTab> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l10n?.moodDistributionTitle ?? '情绪构成分布',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: tc.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              // Segmented Multi-Color Progress Bar
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  height: 12,
-                  child: Row(
-                    children: [
-                      if (posRatio > 0)
-                        Expanded(
-                          flex: (posRatio * 100).round(),
-                          child: Container(color: const Color(0xFFFFB74D)),
-                        ),
-                      if (neuRatio > 0)
-                        Expanded(
-                          flex: (neuRatio * 100).round(),
-                          child: Container(color: const Color(0xFF8C52EE)),
-                        ),
-                      if (negRatio > 0)
-                        Expanded(
-                          flex: (negRatio * 100).round(),
-                          child: Container(color: const Color(0xFF5C6BC0)),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              // Legend Items
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildLegendItem(l10n?.distributionSunny ?? '🌞 欢快', '${(posRatio * 100).toStringAsFixed(0)}%', const Color(0xFFFFB74D), tc),
-                  _buildLegendItem(l10n?.distributionCalm ?? '🌿 平静', '${(neuRatio * 100).toStringAsFixed(0)}%', const Color(0xFF8C52EE), tc),
-                  _buildLegendItem(l10n?.distributionRainy ?? '🌧️ 低落', '${(negRatio * 100).toStringAsFixed(0)}%', const Color(0xFF5C6BC0), tc),
+                  Text(
+                    l10n?.moodDistributionTitle ?? '情绪构成分布',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: tc.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    '共 ${filteredDiaries.length} 篇',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: tc.textSecondary,
+                    ),
+                  ),
                 ],
               ),
+              const SizedBox(height: 18),
+
+              if (filteredDiaries.isEmpty)
+                Container(
+                  height: 120,
+                  alignment: Alignment.center,
+                  child: Text(
+                    '暂无当前时间段的心情记录',
+                    style: TextStyle(color: tc.textSecondary, fontSize: 13),
+                  ),
+                )
+              else
+                Row(
+                  children: [
+                    // Left: Doughnut PieChart with Center Halo Mascot
+                    SizedBox(
+                      width: 140,
+                      height: 140,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          PieChart(
+                            PieChartData(
+                              pieTouchData: PieTouchData(
+                                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                  setState(() {
+                                    if (!event.isInterestedForInteractions ||
+                                        pieTouchResponse == null ||
+                                        pieTouchResponse.touchedSection == null) {
+                                      _touchedPieIndex = -1;
+                                      return;
+                                    }
+                                    _touchedPieIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                                  });
+                                },
+                              ),
+                              startDegreeOffset: 270,
+                              borderData: FlBorderData(show: false),
+                              sectionsSpace: 3,
+                              centerSpaceRadius: 40,
+                              sections: [
+                                // Section 0: 欢快 (Sunny)
+                                PieChartSectionData(
+                                  color: const Color(0xFFFFB74D),
+                                  value: posCount > 0 ? posCount.toDouble() : 0.001,
+                                  title: '',
+                                  radius: _touchedPieIndex == 0 ? 22 : 16,
+                                ),
+                                // Section 1: 平静 (Calm)
+                                PieChartSectionData(
+                                  color: const Color(0xFF8C52EE),
+                                  value: neuCount > 0 ? neuCount.toDouble() : 0.001,
+                                  title: '',
+                                  radius: _touchedPieIndex == 1 ? 22 : 16,
+                                ),
+                                // Section 2: 低落 (Rainy)
+                                PieChartSectionData(
+                                  color: const Color(0xFF5C6BC0),
+                                  value: negCount > 0 ? negCount.toDouble() : 0.001,
+                                  title: '',
+                                  radius: _touchedPieIndex == 2 ? 22 : 16,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Center Mascot Emoji & Dynamic Ratio
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _touchedPieIndex == 0
+                                    ? '🌞'
+                                    : (_touchedPieIndex == 1
+                                        ? '🌿'
+                                        : (_touchedPieIndex == 2
+                                            ? '🌧️'
+                                            : (posCount >= neuCount && posCount >= negCount
+                                                ? '🌞'
+                                                : (neuCount >= negCount ? '🌿' : '🌧️')))),
+                                style: const TextStyle(fontSize: 26),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _touchedPieIndex == 0
+                                    ? '${(posRatio * 100).toStringAsFixed(0)}%'
+                                    : (_touchedPieIndex == 1
+                                        ? '${(neuRatio * 100).toStringAsFixed(0)}%'
+                                        : (_touchedPieIndex == 2
+                                            ? '${(negRatio * 100).toStringAsFixed(0)}%'
+                                            : '${((posCount >= neuCount && posCount >= negCount ? posRatio : (neuCount >= negCount ? neuRatio : negRatio)) * 100).toStringAsFixed(0)}%')),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: tc.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+
+                    // Right: Rich Vertical Legend Rows
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildRichLegendRow(
+                            label: l10n?.distributionSunny ?? '🌞 欢快',
+                            ratioStr: '${(posRatio * 100).toStringAsFixed(0)}%',
+                            countStr: '$posCount 篇',
+                            color: const Color(0xFFFFB74D),
+                            isSelected: _touchedPieIndex == 0,
+                            tc: tc,
+                            onTap: () => setState(() => _touchedPieIndex = _touchedPieIndex == 0 ? -1 : 0),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRichLegendRow(
+                            label: l10n?.distributionCalm ?? '🌿 平静',
+                            ratioStr: '${(neuRatio * 100).toStringAsFixed(0)}%',
+                            countStr: '$neuCount 篇',
+                            color: const Color(0xFF8C52EE),
+                            isSelected: _touchedPieIndex == 1,
+                            tc: tc,
+                            onTap: () => setState(() => _touchedPieIndex = _touchedPieIndex == 1 ? -1 : 1),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRichLegendRow(
+                            label: l10n?.distributionRainy ?? '🌧️ 低落',
+                            ratioStr: '${(negRatio * 100).toStringAsFixed(0)}%',
+                            countStr: '$negCount 篇',
+                            color: const Color(0xFF5C6BC0),
+                            isSelected: _touchedPieIndex == 2,
+                            tc: tc,
+                            onTap: () => setState(() => _touchedPieIndex = _touchedPieIndex == 2 ? -1 : 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -614,6 +731,72 @@ class _StatsTabState extends State<StatsTab> {
           style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: tc.textPrimary),
         ),
       ],
+    );
+  }
+
+  Widget _buildRichLegendRow({
+    required String label,
+    required String ratioStr,
+    required String countStr,
+    required Color color,
+    required bool isSelected,
+    required ThemeColors tc,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.14) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? color.withOpacity(0.5) : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: tc.textPrimary,
+                ),
+              ),
+            ),
+            Text(
+              ratioStr,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: tc.textPrimary,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '($countStr)',
+              style: TextStyle(
+                fontSize: 11,
+                color: tc.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
