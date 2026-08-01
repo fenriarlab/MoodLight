@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../widgets/user_avatar.dart';
+import 'avatar_crop_dialog.dart';
 
 void showChangeAvatarSheet(
   BuildContext context, {
@@ -119,15 +120,13 @@ void showChangeAvatarSheet(
                       imageQuality: 85,
                     );
 
-                    if (pickedFile != null) {
-                      final appDocDir = await getApplicationDocumentsDirectory();
-                      final savedImage = await File(pickedFile.path).copy(
-                        '${appDocDir.path}/user_avatar_custom.png',
-                      );
-
-                      onAvatarChanged('file', savedImage.path);
-                      if (ctx.mounted) {
-                        Navigator.pop(ctx);
+                    if (pickedFile != null && ctx.mounted) {
+                      final croppedPath = await showAvatarCropDialog(ctx, File(pickedFile.path));
+                      if (croppedPath != null && croppedPath.isNotEmpty) {
+                        onAvatarChanged('file', croppedPath);
+                        if (ctx.mounted) {
+                          Navigator.pop(ctx);
+                        }
                       }
                     }
                   } catch (e) {

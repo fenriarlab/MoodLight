@@ -109,6 +109,8 @@
   "customPhoto": "Upload Custom Photo",
   "chooseFromGallery": "📷 Choose from Gallery",
   "avatarUpdated": "Avatar updated successfully!",
+  "cropAvatarTitle": "Crop Avatar",
+  "cropDone": "Done",
   "insightHigh": "Your mood has been sunny! Feeling great joy in [{tag}] 🌟",
   "insightNormal": "Your mood has been steady and calm with [{tag}] 🌿",
   "insightLow": "You might be facing some stress with [{tag}], remember to take a break ☕"
