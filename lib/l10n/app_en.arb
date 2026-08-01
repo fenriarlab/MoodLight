@@ -104,6 +104,11 @@
   "deleteCustomTagTitle": "Delete Custom Tag",
   "deleteCustomTagConfirm": "Are you sure you want to delete custom tag \"{tag}\"?",
   "delete": "Delete",
+  "changeAvatarTitle": "Choose Avatar",
+  "presetAvatars": "Preset Mascots",
+  "customPhoto": "Upload Custom Photo",
+  "chooseFromGallery": "📷 Choose from Gallery",
+  "avatarUpdated": "Avatar updated successfully!",
   "insightHigh": "Your mood has been sunny! Feeling great joy in [{tag}] 🌟",
   "insightNormal": "Your mood has been steady and calm with [{tag}] 🌿",
   "insightLow": "You might be facing some stress with [{tag}], remember to take a break ☕"

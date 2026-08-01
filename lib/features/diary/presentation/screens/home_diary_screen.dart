@@ -4,11 +4,15 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/constants/theme_colors.dart';
 import '../../data/models/mood_diary_model.dart';
 import '../../data/diary_repository.dart';
+import '../widgets/bottom_quote_banner.dart';
+import '../widgets/recent_diaries_card.dart';
+import '../widgets/user_avatar.dart';
 import '../dialogs/record_diary_sheet.dart';
+import '../dialogs/export_data_dialog.dart';
+import '../dialogs/change_avatar_sheet.dart';
 import '../tabs/diaries_tab.dart';
 import '../tabs/stats_tab.dart';
 import '../tabs/settings_tab.dart';
-import '../widgets/bottom_quote_banner.dart';
 
 class HomeDiaryScreen extends StatefulWidget {
   const HomeDiaryScreen({super.key});
@@ -19,14 +23,13 @@ class HomeDiaryScreen extends StatefulWidget {
 
 class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
   int _currentIndex = 0;
-  final DiaryRepository _repository = DiaryRepository();
-  List<MoodDiaryModel> _diaries = [];
-  bool _isLoading = true;
-
-  // Calendar View State
   bool _isCalendarView = true;
   DateTime _calendarSelectedMonth = DateTime.now();
   DateTime _calendarSelectedDate = DateTime.now();
+  String? _selectedFilterTag;
+  List<MoodDiaryModel> _diaries = [];
+  bool _isLoading = true;
+  final DiaryRepository _repository = DiaryRepository();
 
   // Custom Tags State
   static const List<String> _defaultPresetTags = [
@@ -34,13 +37,17 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     '🍔 美食', '🏃 运动', '🎮 娱乐', '😴 睡眠',
   ];
   List<String> _userCustomTags = [];
-  String? _selectedFilterTag;
+
+  // Avatar State
+  String _avatarType = 'preset';
+  String _avatarValue = 'cat_avatar.png';
 
   @override
   void initState() {
     super.initState();
     _loadCustomTags();
     _loadDefaultViewPreference();
+    _loadAvatarPreference();
     _loadDiaries();
   }
 
@@ -84,6 +91,24 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
     });
   }
 
+  Future<void> _loadAvatarPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _avatarType = prefs.getString('user_avatar_type') ?? 'preset';
+      _avatarValue = prefs.getString('user_avatar_value') ?? 'cat_avatar.png';
+    });
+  }
+
+  Future<void> _updateAvatar(String type, String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _avatarType = type;
+      _avatarValue = value;
+    });
+    await prefs.setString('user_avatar_type', type);
+    await prefs.setString('user_avatar_value', value);
+  }
+
   Future<void> _loadDiaries() async {
     setState(() => _isLoading = true);
     final data = await _repository.getAllDiaries();
@@ -103,6 +128,15 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
       onCustomTagAdded: _saveCustomTag,
       onCustomTagDeleted: _deleteCustomTag,
       onSaved: _loadDiaries,
+    );
+  }
+
+  void _openAvatarSheet() {
+    showChangeAvatarSheet(
+      context,
+      currentAvatarType: _avatarType,
+      currentAvatarValue: _avatarValue,
+      onAvatarChanged: _updateAvatar,
     );
   }
 
@@ -172,109 +206,109 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
               ],
             ),
           ),
-          // Cat Avatar Icon
+          // Dynamic Header User Avatar (Tap to switch to Profile Tab)
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: const Color(0xFF8C52EE).withOpacity(0.18),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/images/cat_avatar.png',
-                  errorBuilder: (ctx, err, stack) => const Text('🐱', style: TextStyle(fontSize: 16)),
-                ),
-              ),
+            child: UserAvatar(
+              avatarType: _avatarType,
+              avatarValue: _avatarValue,
+              size: 36,
+              onTap: () {
+                setState(() => _currentIndex = 2);
+              },
             ),
           ),
         ],
       ),
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: tc.isDark
-                  ? const LinearGradient(
-                      colors: [Color(0xFF14121A), Color(0xFF191724), Color(0xFF111017)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    )
-                  : const LinearGradient(
-                      colors: [Color(0xFFF9F4FE), Color(0xFFF5EEFF), Color(0xFFFAFAFE)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+          Column(
+            children: [
+              Expanded(
+                child: IndexedStack(
+                  index: _currentIndex,
+                  children: [
+                    DiariesTab(
+                      isLoading: _isLoading,
+                      diaries: _diaries,
+                      isCalendarView: _isCalendarView,
+                      calendarSelectedMonth: _calendarSelectedMonth,
+                      calendarSelectedDate: _calendarSelectedDate,
+                      selectedFilterTag: _selectedFilterTag,
+                      defaultPresetTags: _defaultPresetTags,
+                      userCustomTags: _userCustomTags,
+                      onTagSelected: (tag) => setState(() => _selectedFilterTag = tag),
+                      onMonthChanged: (month) => setState(() => _calendarSelectedMonth = month),
+                      onDateSelected: (date) => setState(() => _calendarSelectedDate = date),
+                      onRetroactiveRecord: (date) => _showRecordSheet(defaultDate: date),
+                      onDeleteDiary: (diary) async {
+                        await _repository.deleteDiary(diary.id);
+                        _loadDiaries();
+                      },
+                      onEditDiary: (diary) => _showRecordSheet(existingDiary: diary),
+                      onReload: _loadDiaries,
+                      onTrendTap: () => setState(() => _currentIndex = 1),
                     ),
-            ),
-            child: IndexedStack(
-              index: _currentIndex,
-              children: [
-                DiariesTab(
-                  isLoading: _isLoading,
-                  isCalendarView: _isCalendarView,
-                  diaries: _diaries,
-                  defaultPresetTags: _defaultPresetTags,
-                  userCustomTags: _userCustomTags,
-                  selectedFilterTag: _selectedFilterTag,
-                  calendarSelectedMonth: _calendarSelectedMonth,
-                  calendarSelectedDate: _calendarSelectedDate,
-                  onTagSelected: (tag) => setState(() => _selectedFilterTag = tag),
-                  onMonthChanged: (month) => setState(() => _calendarSelectedMonth = month),
-                  onDateSelected: (date) => setState(() => _calendarSelectedDate = date),
-                  onRetroactiveRecord: (date) => _showRecordSheet(defaultDate: date),
-                  onDeleteDiary: (diary) async {
-                    await _repository.deleteDiary(diary.id);
-                    _loadDiaries();
-                  },
-                  onEditDiary: (diary) => _showRecordSheet(existingDiary: diary),
-                  onReload: _loadDiaries,
-                  onTrendTap: () => setState(() => _currentIndex = 1),
+                    StatsTab(diaries: _diaries),
+                    SettingsTab(
+                      isCalendarView: _isCalendarView,
+                      diaries: _diaries,
+                      onDefaultViewChanged: (val) => setState(() => _isCalendarView = val),
+                      avatarType: _avatarType,
+                      avatarValue: _avatarValue,
+                      onChangeAvatar: _openAvatarSheet,
+                    ),
+                  ],
                 ),
-                StatsTab(diaries: _diaries),
-                SettingsTab(
-                  isCalendarView: _isCalendarView,
-                  diaries: _diaries,
-                  onDefaultViewChanged: (val) => setState(() => _isCalendarView = val),
+              ),
+              if (_currentIndex == 0)
+                BottomQuoteBanner(
+                  selectedDate: _calendarSelectedDate,
+                  onRecordTap: () => _showRecordSheet(defaultDate: _calendarSelectedDate),
                 ),
-              ],
-            ),
+            ],
           ),
-          // True Floating Cat Paws Button (Only on Home/Diaries Tab)
-          if (_currentIndex == 0)
-            Positioned(
-              right: 16,
-              bottom: 16,
-              child: BottomQuoteBanner(
-                selectedDate: _calendarSelectedDate,
-                onRecordTap: () => _showRecordSheet(
-                  defaultDate: _isCalendarView ? _calendarSelectedDate : null,
-                ),
+          if (_isLoading)
+            Container(
+              color: Colors.black12,
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF8C52EE)),
               ),
             ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() => _currentIndex = index);
-        },
-        backgroundColor: tc.isDark ? const Color(0xFF191724) : Colors.white,
-        indicatorColor: const Color(0xFF8C52EE).withOpacity(0.18),
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined, color: tc.textSecondary),
-            selectedIcon: const Icon(Icons.home_rounded, color: Color(0xFF8C52EE)),
-            label: l10n?.tabHome ?? '首页',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: tc.isDark ? const Color(0xFF2D273A) : const Color(0xFFEFE8FB),
+              width: 1,
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.show_chart_outlined, color: tc.textSecondary),
-            selectedIcon: const Icon(Icons.show_chart_rounded, color: Color(0xFF8C52EE)),
-            label: l10n?.tabStats ?? '趋势',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.pets_outlined, color: tc.textSecondary),
-            selectedIcon: const Icon(Icons.pets_rounded, color: Color(0xFF8C52EE)),
-            label: l10n?.tabProfile ?? '我的',
-          ),
-        ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          backgroundColor: tc.surface,
+          selectedItemColor: const Color(0xFF8C52EE),
+          unselectedItemColor: tc.textSecondary,
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.favorite_rounded),
+              label: l10n?.tabHome ?? '首页',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.bar_chart_rounded),
+              label: l10n?.tabStats ?? '趋势',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.tune_rounded),
+              label: l10n?.tabSettings ?? '设置',
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -104,6 +104,11 @@
   "deleteCustomTagTitle": "删除自定义标签",
   "deleteCustomTagConfirm": "确定要删除自定义标签“{tag}”吗？",
   "delete": "删除",
+  "changeAvatarTitle": "选择专属头像",
+  "presetAvatars": "治愈预设形象",
+  "customPhoto": "相册自定义上传",
+  "chooseFromGallery": "📷 从相册选择照片",
+  "avatarUpdated": "头像已成功更新！",
   "insightHigh": "这段时间你的心情非常阳光欢快！在【{tag}】维度感受到了满满的喜悦与力量 🌟",
   "insightNormal": "这段时间你的心情平稳且充满秩序，在【{tag}】方面保持着极佳的节奏 🌿",
   "insightLow": "这段时间小有波折，在【{tag}】方面可能有些压力，记得给自己放个假咖啡泡起来 ☕"
