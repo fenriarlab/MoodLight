@@ -98,10 +98,11 @@ class _ImportDataModalState extends State<ImportDataModal> {
       widget.onImportCompleted();
 
       if (mounted) {
+        final versionStr = dataMap['app_version'] ?? '1.0.0';
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('🎉 成功解密并恢复 ${importedDiaries.length} 篇心情日记！'),
+            content: Text('🎉 成功解密并恢复 ${importedDiaries.length} 篇日记！(备份版本: v$versionStr)'),
             backgroundColor: const Color(0xFF8C52EE),
           ),
         );

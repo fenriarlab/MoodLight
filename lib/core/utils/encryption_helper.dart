@@ -38,8 +38,13 @@ class EncryptionHelper {
     return derivedKey;
   }
 
-  /// Encrypt plain JSON payload using AES-256-CBC/GCM with user password
-  static String encryptPayload(String plainJson, String password, {required int totalCount}) {
+  /// Encrypt plain JSON payload using AES-256-CBC with user password
+  static String encryptPayload(
+    String plainJson,
+    String password, {
+    required int totalCount,
+    String appVersion = '1.0.0+1',
+  }) {
     final random = Random.secure();
 
     // 16-byte Salt & 16-byte IV
@@ -56,6 +61,7 @@ class EncryptionHelper {
     final envelope = {
       'schema_version': 2,
       'app_name': 'MoodLight',
+      'app_version': appVersion,
       'is_encrypted': true,
       'exported_at': DateTime.now().toIso8601String(),
       'total_count': totalCount,

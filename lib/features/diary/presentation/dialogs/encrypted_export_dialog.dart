@@ -50,8 +50,9 @@ class _EncryptedExportModalState extends State<EncryptedExportModal> {
     }
 
     final rawPayload = {
-      'schema_version': 1,
+      'schema_version': 2,
       'app_name': 'MoodLight',
+      'app_version': '1.0.0+1',
       'exported_at': DateTime.now().toIso8601String(),
       'total_count': widget.diaries.length,
       'diaries': widget.diaries.map((d) => d.toMap()).toList(),
