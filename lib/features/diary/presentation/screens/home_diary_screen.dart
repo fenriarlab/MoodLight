@@ -262,9 +262,15 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                 ),
               ),
               if (_currentIndex == 0)
-                BottomQuoteBanner(
-                  selectedDate: _calendarSelectedDate,
-                  onRecordTap: () => _showRecordSheet(defaultDate: _calendarSelectedDate),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16, bottom: 16),
+                    child: BottomQuoteBanner(
+                      selectedDate: _calendarSelectedDate,
+                      onRecordTap: () => _showRecordSheet(defaultDate: _calendarSelectedDate),
+                    ),
+                  ),
                 ),
             ],
           ),

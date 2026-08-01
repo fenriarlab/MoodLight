@@ -153,31 +153,22 @@ class SettingsTab extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(l10n?.themeMode ?? '主题模式', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: tc.textPrimary)),
-                    SegmentedButton<ThemeMode>(
-                      style: ButtonStyle(
-                        visualDensity: VisualDensity.compact,
-                        backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                          if (states.contains(MaterialState.selected)) {
-                            return const Color(0xFF8C52EE);
-                          }
-                          return Colors.transparent;
-                        }),
-                        foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                          if (states.contains(MaterialState.selected)) {
-                            return Colors.white;
-                          }
-                          return tc.textSecondary;
-                        }),
-                      ),
-                      segments: [
-                        ButtonSegment(value: ThemeMode.light, label: Text(l10n?.themeModeLight ?? '浅色')),
-                        ButtonSegment(value: ThemeMode.dark, label: Text(l10n?.themeModeDark ?? '暗黑')),
-                        ButtonSegment(value: ThemeMode.system, label: Text(l10n?.themeModeSystem ?? '跟随系统')),
-                      ],
-                      selected: {currentThemeMode},
-                      onSelectionChanged: (Set<ThemeMode> newSelection) {
-                        appState?.updateThemeMode(newSelection.first);
+                    DropdownButton<ThemeMode>(
+                      value: currentThemeMode,
+                      dropdownColor: tc.surface,
+                      style: TextStyle(color: tc.textPrimary, fontSize: 14),
+                      underline: const SizedBox(),
+                      icon: Icon(Icons.arrow_drop_down, color: tc.textSecondary),
+                      onChanged: (ThemeMode? newValue) {
+                        if (newValue != null) {
+                          appState?.updateThemeMode(newValue);
+                        }
                       },
+                      items: [
+                        DropdownMenuItem(value: ThemeMode.system, child: Text(l10n?.themeModeSystem ?? '跟随系统')),
+                        DropdownMenuItem(value: ThemeMode.light, child: Text(l10n?.themeModeLight ?? '浅色')),
+                        DropdownMenuItem(value: ThemeMode.dark, child: Text(l10n?.themeModeDark ?? '暗黑')),
+                      ],
                     ),
                   ],
                 ),
