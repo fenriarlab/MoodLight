@@ -5,6 +5,8 @@ import '../../../../core/constants/theme_colors.dart';
 import '../../../../main.dart';
 import '../../data/models/mood_diary_model.dart';
 import '../dialogs/export_data_dialog.dart';
+import '../dialogs/encrypted_export_dialog.dart';
+import '../dialogs/import_data_dialog.dart';
 import '../widgets/user_avatar.dart';
 
 class SettingsTab extends StatelessWidget {
@@ -14,6 +16,7 @@ class SettingsTab extends StatelessWidget {
   final String avatarType;
   final String avatarValue;
   final VoidCallback onChangeAvatar;
+  final VoidCallback? onReload;
 
   const SettingsTab({
     super.key,
@@ -23,6 +26,7 @@ class SettingsTab extends StatelessWidget {
     required this.avatarType,
     required this.avatarValue,
     required this.onChangeAvatar,
+    this.onReload,
   });
 
   @override
@@ -229,7 +233,24 @@ class SettingsTab extends StatelessWidget {
         ),
 
         // 3. Data Management Section
-        _buildSectionHeader(l10n?.sectionData ?? '数据管理', Icons.storage_outlined, tc),
+        _buildSectionHeader(l10n?.sectionData ?? '数据管理与备份', Icons.shield_outlined, tc),
+        Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          color: tc.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: tc.divider, width: 1),
+          ),
+          child: ListTile(
+            leading: const Icon(Icons.lock_rounded, color: Color(0xFF8C52EE)),
+            title: Text(l10n?.exportEncryptedData ?? '导出加密备份 (JSON)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: tc.textPrimary)),
+            subtitle: Text(l10n?.exportEncryptedSubtitle ?? '设置专属密码进行 AES-256 高强度加密，安全用于微信/网盘迁移。', style: TextStyle(fontSize: 11, color: tc.textSecondary)),
+            trailing: Icon(Icons.chevron_right, color: tc.textSecondary),
+            onTap: () {
+              showEncryptedExportDialog(context, diaries);
+            },
+          ),
+        ),
         Card(
           color: tc.surface,
           shape: RoundedRectangleBorder(
@@ -237,12 +258,17 @@ class SettingsTab extends StatelessWidget {
             side: BorderSide(color: tc.divider, width: 1),
           ),
           child: ListTile(
-            leading: const Icon(Icons.download_rounded, color: Color(0xFF8C52EE)),
-            title: Text(l10n?.exportData ?? '导出日记数据 (JSON)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: tc.textPrimary)),
-            subtitle: Text(l10n?.exportDataSubtitle ?? '一键备份本地所有心情日记，方便导入或迁移。', style: TextStyle(fontSize: 11, color: tc.textSecondary)),
+            leading: const Icon(Icons.file_download_rounded, color: Color(0xFF8C52EE)),
+            title: Text(l10n?.importData ?? '解密恢复备份', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: tc.textPrimary)),
+            subtitle: Text(l10n?.importDataSubtitle ?? '输入密码解密备份文件，并恢复日记数据到本地。', style: TextStyle(fontSize: 11, color: tc.textSecondary)),
             trailing: Icon(Icons.chevron_right, color: tc.textSecondary),
             onTap: () {
-              showExportDataDialog(context, diaries);
+              showImportDataDialog(
+                context,
+                onImportCompleted: () {
+                  onReload?.call();
+                },
+              );
             },
           ),
         ),

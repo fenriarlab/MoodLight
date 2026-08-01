@@ -257,6 +257,7 @@ class _HomeDiaryScreenState extends State<HomeDiaryScreen> {
                       avatarType: _avatarType,
                       avatarValue: _avatarValue,
                       onChangeAvatar: _openAvatarSheet,
+                      onReload: _loadDiaries,
                     ),
                   ],
                 ),
