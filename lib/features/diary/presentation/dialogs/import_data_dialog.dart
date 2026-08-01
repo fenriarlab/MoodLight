@@ -87,15 +87,12 @@ class _ImportDataModalState extends State<ImportDataModal> {
       // 3. Database restoration according to mode
       if (_importMode == 1) {
         // Overwrite mode: Clear all existing records first
-        final existing = await _repository.getAllDiaries();
-        for (var diary in existing) {
-          await _repository.deleteDiary(diary.id);
-        }
+        await _repository.clearAllDiaries();
       }
 
       // Merge or Insert
       for (var diary in importedDiaries) {
-        await _repository.saveDiary(diary);
+        await _repository.insertDiary(diary);
       }
 
       widget.onImportCompleted();
