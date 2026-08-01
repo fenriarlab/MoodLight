@@ -31,7 +31,7 @@ class _AvatarCropScreenState extends State<AvatarCropScreen> {
   final TransformationController _transformationController = TransformationController();
   bool _isSaving = false;
 
-  Future<void> _cropAndSave() async {
+  Future<void> _cropAndSave(double cropRadius, Size viewportSize) async {
     if (_isSaving) return;
     setState(() => _isSaving = true);
 
@@ -42,8 +42,35 @@ class _AvatarCropScreenState extends State<AvatarCropScreen> {
         return;
       }
 
-      final image = await boundary.toImage(pixelRatio: 2.5);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      const pixelRatio = 2.5;
+      final fullImage = await boundary.toImage(pixelRatio: pixelRatio);
+
+      final double diameter = cropRadius * 2;
+      final double srcLeft = (viewportSize.width / 2 - cropRadius) * pixelRatio;
+      final double srcTop = (viewportSize.height / 2 - cropRadius) * pixelRatio;
+      final double srcSize = diameter * pixelRatio;
+
+      final srcRect = Rect.fromLTWH(srcLeft, srcTop, srcSize, srcSize);
+      final outputSize = srcSize.toInt();
+
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+
+      // Clip Canvas to Circle
+      final path = Path()..addOval(Rect.fromLTWH(0, 0, srcSize, srcSize));
+      canvas.clipPath(path);
+
+      // Draw Sub-region from full viewport image
+      canvas.drawImageRect(
+        fullImage,
+        srcRect,
+        Rect.fromLTWH(0, 0, srcSize, srcSize),
+        Paint()..filterQuality = FilterQuality.high,
+      );
+
+      final croppedPicture = recorder.endRecording();
+      final croppedImage = await croppedPicture.toImage(outputSize, outputSize);
+      final byteData = await croppedImage.toByteData(format: ui.ImageByteFormat.png);
 
       if (byteData == null) {
         setState(() => _isSaving = false);
@@ -77,15 +104,15 @@ class _AvatarCropScreenState extends State<AvatarCropScreen> {
   Widget build(BuildContext context) {
     final tc = ThemeColors.of(context);
     final l10n = AppLocalizations.of(context);
-    final size = MediaQuery.of(context).size;
-    final cropRadius = (size.width * 0.72) / 2;
+    final screenSize = MediaQuery.of(context).size;
+    final double cropRadius = (screenSize.width * 0.72) / 2;
 
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Column(
           children: [
-            // Top Action Header
+            // 1. Top Action Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -106,83 +133,90 @@ class _AvatarCropScreenState extends State<AvatarCropScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: _isSaving ? null : _cropAndSave,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8C52EE),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                    ),
-                    child: _isSaving
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                          )
-                        : Text(
-                            l10n?.cropDone ?? '完成',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return ElevatedButton(
+                        onPressed: _isSaving
+                            ? null
+                            : () => _cropAndSave(cropRadius, Size(screenSize.width, screenSize.height - 140)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF8C52EE),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                        ),
+                        child: _isSaving
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              )
+                            : Text(
+                                l10n?.cropDone ?? '完成',
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
 
-            // Interactive Cropping Area
+            // 2. Interactive Viewport & Semi-Transparent Mask Stack
             Expanded(
-              child: Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(cropRadius),
-                  child: Container(
-                    width: cropRadius * 2,
-                    height: cropRadius * 2,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF8C52EE).withOpacity(0.5),
-                          blurRadius: 16,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: RepaintBoundary(
-                      key: _repaintKey,
-                      child: ClipOval(
-                        child: Container(
-                          color: Colors.black,
-                          child: InteractiveViewer(
-                            transformationController: _transformationController,
-                            minScale: 1.0,
-                            maxScale: 4.0,
-                            panEnabled: true,
-                            scaleEnabled: true,
-                            child: Image.file(
-                              widget.imageFile,
-                              fit: BoxFit.cover,
-                              width: cropRadius * 2,
-                              height: cropRadius * 2,
+              child: LayoutBuilder(
+                builder: (ctx, constraints) {
+                  final viewportSize = Size(constraints.maxWidth, constraints.maxHeight);
+
+                  return Stack(
+                    children: [
+                      // Layer A: Full Interactive Image Workspace (Captured by RepaintBoundary)
+                      Positioned.fill(
+                        child: RepaintBoundary(
+                          key: _repaintKey,
+                          child: Container(
+                            color: Colors.black,
+                            child: InteractiveViewer(
+                              transformationController: _transformationController,
+                              minScale: 1.0,
+                              maxScale: 4.0,
+                              panEnabled: true,
+                              scaleEnabled: true,
+                              child: Center(
+                                child: Image.file(
+                                  widget.imageFile,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
+
+                      // Layer B: Semi-transparent Overlay Mask with Clear Circular Cutout Window
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: CustomPaint(
+                            size: viewportSize,
+                            painter: CircularCropMaskPainter(cropRadius: cropRadius),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
 
-            // Bottom Tip Text
+            // 3. Bottom Tip Text
             Padding(
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Text(
                 '拖动或双指缩放照片以微调位置',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withOpacity(0.65),
                   fontSize: 13,
                 ),
               ),
@@ -191,5 +225,54 @@ class _AvatarCropScreenState extends State<AvatarCropScreen> {
         ),
       ),
     );
+  }
+}
+
+/// Custom Painter for Semi-transparent Dark Mask Overlay with Circular Cutout
+class CircularCropMaskPainter extends CustomPainter {
+  final double cropRadius;
+
+  CircularCropMaskPainter({required this.cropRadius});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+
+    // Full Viewport Outer Path
+    final outerPath = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    // Circular Cutout Inner Path
+    final innerPath = Path()..addOval(Rect.fromCircle(center: center, radius: cropRadius));
+
+    // Semi-transparent Mask Path (Outer minus Inner)
+    final maskPath = Path.combine(PathOperation.difference, outerPath, innerPath);
+
+    final maskPaint = Paint()
+      ..color = Colors.black.withOpacity(0.68)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(maskPath, maskPaint);
+
+    // Crisp White Border Line around Circular Viewport
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    canvas.drawCircle(center, cropRadius, borderPaint);
+
+    // Subtle Outer Glow Halo around Border Line
+    final shadowPaint = Paint()
+      ..color = const Color(0xFF8C52EE).withOpacity(0.4)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.0
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+
+    canvas.drawCircle(center, cropRadius + 1, shadowPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CircularCropMaskPainter oldDelegate) {
+    return oldDelegate.cropRadius != cropRadius;
   }
 }
