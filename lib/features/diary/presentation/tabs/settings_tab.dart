@@ -251,7 +251,7 @@ class SettingsTab extends StatelessWidget {
             subtitle: Text(l10n?.exportDataSubtitle ?? '一键备份本地所有心情日记，方便导入或迁移。', style: TextStyle(fontSize: 11, color: tc.textSecondary)),
             trailing: Icon(Icons.chevron_right, color: tc.textSecondary),
             onTap: () {
-              showExportDataDialog(context, diaries: diaries);
+              showExportDataDialog(context, diaries);
             },
           ),
         ),
