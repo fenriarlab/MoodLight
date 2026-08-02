@@ -31,6 +31,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
 
 // 🌟 构建完成后自动生成包含确切版本号的 APK 副本：MoodLight_v1.0.1_release.apk
 tasks.configureEach {
